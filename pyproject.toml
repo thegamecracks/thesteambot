@@ -1,0 +1,16 @@
+[project]
+name = "thesteambot"
+description = "A workspace project for thesteambot."
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "thesteambot-bot",
+    "thesteambot-web",
+]
+
+[tool.uv.sources]
+thesteambot-bot = { workspace = true }
+thesteambot-web = { workspace = true }
+
+[tool.uv.workspace]
+members = ["bot", "web"]

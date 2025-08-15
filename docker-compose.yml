@@ -1,0 +1,9 @@
+services:
+  bot:
+    build:
+      context: bot
+    # restart: unless-stopped
+  web:
+    build:
+      context: web
+    # restart: unless-stopped

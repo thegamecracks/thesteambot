@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=80"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "thesteambot-bot"
+description = "A discord bot for associating users with Steam accounts."
+version = "0.1.0"
+requires-python = ">=3.11"
+authors = [{ name = "thegamecracks" }]
+dependencies = [
+    "authlib~=1.6",
+    "discord.py~=2.5",
+    "httpx==0.28.1",
+    "jishaku~=2.6",
+]
+
+[project.scripts]
+thesteambot-bot = "thesteambot.bot.__main__:main"
