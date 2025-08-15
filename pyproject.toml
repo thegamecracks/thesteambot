@@ -13,4 +13,4 @@ thesteambot-bot = { workspace = true }
 thesteambot-web = { workspace = true }
 
 [tool.uv.workspace]
-members = ["bot", "web"]
+members = ["packages/*"]

@@ -686,14 +686,14 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "thesteambot-bot", editable = "bot" },
-    { name = "thesteambot-web", editable = "web" },
+    { name = "thesteambot-bot", editable = "packages/bot" },
+    { name = "thesteambot-web", editable = "packages/web" },
 ]
 
 [[package]]
 name = "thesteambot-bot"
 version = "0.1.0"
-source = { editable = "bot" }
+source = { editable = "packages/bot" }
 dependencies = [
     { name = "authlib" },
     { name = "discord-py" },
@@ -712,7 +712,7 @@ requires-dist = [
 [[package]]
 name = "thesteambot-web"
 version = "0.1.0"
-source = { editable = "web" }
+source = { editable = "packages/web" }
 dependencies = [
     { name = "authlib" },
     { name = "httpx" },

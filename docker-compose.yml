@@ -1,21 +1,21 @@
 services:
   bot:
     build:
-      dockerfile: bot/Dockerfile
+      dockerfile: packages/bot/Dockerfile
     develop:
       watch:
-        - path: bot/src/
+        - path: packages/bot/src/
           action: rebuild
-        - path: bot/pyproject.toml
+        - path: packages/bot/pyproject.toml
           action: rebuild
     # restart: unless-stopped
   web:
     build:
-      dockerfile: web/Dockerfile
+      dockerfile: packages/web/Dockerfile
     develop:
       watch:
-        - path: web/src/
+        - path: packages/web/src/
           action: rebuild
-        - path: web/pyproject.toml
+        - path: packages/web/pyproject.toml
           action: rebuild
     # restart: unless-stopped
