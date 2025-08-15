@@ -1,21 +1,19 @@
 services:
   bot:
     build:
-      dockerfile: packages/bot/Dockerfile
+      context: .
+    command: thesteambot.bot
     develop:
       watch:
-        - path: packages/bot/src/
-          action: rebuild
-        - path: packages/bot/pyproject.toml
+        - path: packages/bot/
           action: rebuild
     # restart: unless-stopped
   web:
     build:
-      dockerfile: packages/web/Dockerfile
+      context: .
+    command: thesteambot.web
     develop:
       watch:
-        - path: packages/web/src/
-          action: rebuild
-        - path: packages/web/pyproject.toml
+        - path: packages/web/
           action: rebuild
     # restart: unless-stopped
