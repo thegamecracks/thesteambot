@@ -18,8 +18,9 @@ jobs:
       with:
         cache: pip
         cache-dependency-path: |
-          bot/pyproject.toml
-          web/pyproject.toml
+          packages/bot/pyproject.toml
+          packages/web/pyproject.toml
+          pyproject.toml
         python-version: '3.11'
     - run: pip install pyright
     - run: pip install .
