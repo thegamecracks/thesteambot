@@ -7,6 +7,9 @@ services:
       watch:
         - path: packages/bot/
           action: rebuild
+    env_file:
+      - .env
+      - .env.bot
     # restart: unless-stopped
   web:
     build:
@@ -16,4 +19,7 @@ services:
       watch:
         - path: packages/web/
           action: rebuild
+    env_file:
+      - .env
+      - .env.web
     # restart: unless-stopped
