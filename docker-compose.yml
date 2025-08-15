@@ -1,7 +1,7 @@
 services:
   bot:
     build:
-      context: bot
+      dockerfile: bot/Dockerfile
     develop:
       watch:
         - path: bot/src/
@@ -11,7 +11,7 @@ services:
     # restart: unless-stopped
   web:
     build:
-      context: web
+      dockerfile: web/Dockerfile
     develop:
       watch:
         - path: web/src/
