@@ -2,8 +2,20 @@ services:
   bot:
     build:
       context: bot
+    develop:
+      watch:
+        - path: bot/src/
+          action: rebuild
+        - path: bot/pyproject.toml
+          action: rebuild
     # restart: unless-stopped
   web:
     build:
       context: web
+    develop:
+      watch:
+        - path: web/src/
+          action: rebuild
+        - path: web/pyproject.toml
+          action: rebuild
     # restart: unless-stopped
