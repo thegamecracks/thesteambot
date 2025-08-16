@@ -1,0 +1,13 @@
+html {
+    color-scheme: light dark;
+}
+
+body {
+    margin-left: auto;
+    margin-right: auto;
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+
+    >* {
+        width: 100%;
+    }
+}

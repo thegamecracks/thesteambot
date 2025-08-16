@@ -1,3 +1,5 @@
+import importlib.resources
+
 from starlette.applications import Starlette
 from starlette.config import Config
 from starlette.datastructures import Secret
@@ -6,17 +8,24 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.requests import Request
-from starlette.responses import PlainTextResponse, Response
-from starlette.routing import Route
+from starlette.responses import Response
+from starlette.routing import Mount, Route
+from starlette.staticfiles import StaticFiles
+from starlette.templating import Jinja2Templates
 
 config = Config()
 DEBUG = config("DEBUG") not in ("", "0")
 DOMAIN = config("DOMAIN")
 WEB_SECRET_KEY = config("WEB_SECRET_KEY", cast=Secret)
 
+assert __package__ is not None
+package = importlib.resources.files(__package__)
+
+templates = Jinja2Templates(directory=str(package.joinpath("templates")))
+
 
 def homepage(request: Request) -> Response:
-    return PlainTextResponse("Hello world!")
+    return templates.TemplateResponse(request, "index.j2")
 
 
 allowed_hosts = [DOMAIN]
@@ -27,6 +36,11 @@ app = Starlette(
     debug=DEBUG,
     routes=[
         Route("/", homepage),
+        Mount(
+            "/static",
+            name="static",
+            app=StaticFiles(directory=str(package.joinpath("static"))),
+        ),
     ],
     middleware=[
         Middleware(CORSMiddleware),

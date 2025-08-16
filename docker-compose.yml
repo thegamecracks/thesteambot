@@ -17,6 +17,12 @@ services:
     command: thesteambot.web
     develop:
       watch:
+        - path: packages/web/src/thesteambot/web/static/
+          target: /packages/web/src/thesteambot/web/static/
+          action: sync
+        - path: packages/web/src/thesteambot/web/templates/
+          target: /packages/web/src/thesteambot/web/templates/
+          action: sync
         - path: packages/web/
           action: rebuild
     env_file:
