@@ -6,13 +6,6 @@ resolution-markers = [
     "python_full_version < '3.13'",
 ]
 
-[manifest]
-members = [
-    "thesteambot",
-    "thesteambot-bot",
-    "thesteambot-web",
-]
-
 [[package]]
 name = "aiohappyeyeballs"
 version = "2.6.1"
@@ -827,28 +820,15 @@ wheels = [
 [[package]]
 name = "thesteambot"
 version = "0.1.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "thesteambot-bot" },
-    { name = "thesteambot-web" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "thesteambot-bot", editable = "packages/bot" },
-    { name = "thesteambot-web", editable = "packages/web" },
-]
-
-[[package]]
-name = "thesteambot-bot"
-version = "0.1.0"
-source = { editable = "packages/bot" }
+source = { editable = "." }
 dependencies = [
     { name = "authlib" },
     { name = "discord-py" },
     { name = "hikari" },
     { name = "httpx" },
     { name = "jishaku" },
+    { name = "starlette", extra = ["full"] },
+    { name = "uvicorn" },
 ]
 
 [package.metadata]
@@ -858,23 +838,6 @@ requires-dist = [
     { name = "hikari", specifier = "~=2.3.5" },
     { name = "httpx", specifier = "==0.28.1" },
     { name = "jishaku", specifier = "~=2.6" },
-]
-
-[[package]]
-name = "thesteambot-web"
-version = "0.1.0"
-source = { editable = "packages/web" }
-dependencies = [
-    { name = "authlib" },
-    { name = "httpx" },
-    { name = "starlette", extra = ["full"] },
-    { name = "uvicorn" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "authlib", specifier = "~=1.6" },
-    { name = "httpx", specifier = "==0.28.1" },
     { name = "starlette", extras = ["full"], specifier = "==0.47.2" },
     { name = "uvicorn", specifier = "==0.35.0" },
 ]

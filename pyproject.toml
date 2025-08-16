@@ -1,16 +1,22 @@
+[build-system]
+requires = ["setuptools>=80"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "thesteambot"
-description = "A workspace project for thesteambot."
+description = "A Discord application for associating users with Steam accounts."
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
-    "thesteambot-bot",
-    "thesteambot-web",
+    "authlib~=1.6",
+    "discord.py~=2.5",
+    "hikari~=2.3.5",
+    "httpx==0.28.1",
+    "jishaku~=2.6",
+    "starlette[full]==0.47.2",
+    "uvicorn==0.35.0",
 ]
 
-[tool.uv.sources]
-thesteambot-bot = { workspace = true }
-thesteambot-web = { workspace = true }
-
-[tool.uv.workspace]
-members = ["packages/*"]
+[project.scripts]
+thesteambot-bot = "thesteambot.bot.__main__:main"
+thesteambot-web = "thesteambot.web.__main__:main"
