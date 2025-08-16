@@ -31,14 +31,14 @@ docker compose up --build
 To run a single service at a time:
 
 ```sh
-docker compose run --build --service-ports bot
-docker compose run --build --service-ports web
+docker compose up --build bot
+docker compose up --build web
 ```
 
-To run all services and live-rebuild images when modifying source code:
+To run all services and live-rebuild when modifying source code:
 
 ```sh
-docker compose watch
+docker compose up --build --remove-orphans --watch
 ```
 
 Once running, the HTTP webserver can be accessed at port 2500.
