@@ -10,6 +10,7 @@ from starlette.responses import PlainTextResponse, Response
 from starlette.routing import Route
 
 config = Config()
+DEBUG = config("DEBUG") not in ("", "0")
 DOMAIN = config("DOMAIN")
 WEB_SECRET_KEY = config("WEB_SECRET_KEY", cast=Secret)
 
@@ -18,7 +19,12 @@ def homepage(request: Request) -> Response:
     return PlainTextResponse("Hello world!")
 
 
+allowed_hosts = [DOMAIN]
+if DEBUG:
+    allowed_hosts.extend(("localhost", "127.0.0.1"))
+
 app = Starlette(
+    debug=DEBUG,
     routes=[
         Route("/", homepage),
     ],
@@ -27,11 +33,7 @@ app = Starlette(
         Middleware(SessionMiddleware, secret_key=WEB_SECRET_KEY, https_only=True),
         Middleware(
             TrustedHostMiddleware,
-            allowed_hosts=[
-                DOMAIN,
-                "localhost",
-                "127.0.0.1",
-            ],
+            allowed_hosts=allowed_hosts,
             www_redirect=False,
         ),
     ],
