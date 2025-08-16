@@ -24,6 +24,9 @@ services:
           target: /packages/web/src/thesteambot/web/templates/
           action: sync
         - path: packages/web/
+          ignore:
+            - '**/static/'
+            - '**/templates/'
           action: rebuild
     env_file:
       - .env
