@@ -25,3 +25,5 @@ To run all services and live-rebuild images when modifying source code:
 ```sh
 docker compose watch
 ```
+
+Once running, the HTTP webserver can be accessed at port 2500.
