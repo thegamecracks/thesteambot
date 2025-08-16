@@ -11,7 +11,8 @@ from starlette.requests import Request
 from starlette.responses import Response
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
-from starlette.templating import Jinja2Templates
+
+from thesteambot.web.templating import templates
 
 config = Config()
 DEBUG = config("DEBUG") not in ("", "0")
@@ -20,8 +21,6 @@ WEB_SECRET_KEY = config("WEB_SECRET_KEY", cast=Secret)
 
 assert __package__ is not None
 package = importlib.resources.files(__package__)
-
-templates = Jinja2Templates(directory=str(package.joinpath("templates")))
 
 
 def homepage(request: Request) -> Response:
