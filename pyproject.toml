@@ -8,6 +8,7 @@ description = "A Discord application for associating users with Steam accounts."
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
+    "asyncpg==0.30.0",
     "authlib~=1.6",
     "discord.py~=2.5",
     "hikari~=2.3.5",
