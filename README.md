@@ -4,6 +4,7 @@
 
 - Discord application in https://discord.com/developers/applications
 - Members privileged intent associated with your application's bot
+- A reverse proxy, like Apache or Nginx, configured with your domain and TLS encryption
 
 ## Usage
 
