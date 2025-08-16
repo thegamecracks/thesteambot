@@ -3,6 +3,8 @@ services:
     build:
       context: .
     command: thesteambot.bot
+    depends_on:
+      - db
     develop:
       watch:
         - path: packages/bot/
@@ -11,10 +13,30 @@ services:
       - .env
       - .env.bot
     # restart: unless-stopped
+  db:
+    image: postgres:17
+    environment:
+      PGDATA: /var/lib/postgresql/17/docker
+      PGPORT: ${DB_PORT:?}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?}
+      POSTGRES_USER: ${DB_USER:?}
+      POSTGRES_DB: ${DB_DATABASE:?}
+    expose:
+      - ${DB_PORT:?}
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    restart: always
+    volumes:
+      - db-data:/var/lib/postgresql
   web:
     build:
       context: .
     command: thesteambot.web
+    depends_on:
+      - db
     develop:
       watch:
         - path: packages/web/src/thesteambot/web/static/
@@ -34,3 +56,6 @@ services:
     ports:
       - 2500:8000
     # restart: unless-stopped
+
+volumes:
+  db-data:
