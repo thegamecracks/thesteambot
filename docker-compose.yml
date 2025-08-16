@@ -22,4 +22,6 @@ services:
     env_file:
       - .env
       - .env.web
+    ports:
+      - 2500:8000
     # restart: unless-stopped
