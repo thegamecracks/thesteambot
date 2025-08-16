@@ -1,0 +1,10 @@
+{% extends "base.j2" %}
+{% block title %}Discord OAuth{% endblock %}
+{% block content %}
+    <p>This is our redirect page for Discord's OAuth2 flow.</p>
+    {% if success %}
+        <p>Congratulations! You've been authorized!</p>
+    {% else %}
+        <p>Sorry, we could not authorize you. Please try again later.</p>
+    {% endif %}
+{% endblock %}

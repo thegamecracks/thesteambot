@@ -12,6 +12,7 @@ from starlette.responses import Response
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
+from thesteambot.web import auth, login
 from thesteambot.web.templating import templates
 
 config = Config()
@@ -35,6 +36,8 @@ app = Starlette(
     debug=DEBUG,
     routes=[
         Route("/", homepage),
+        Mount("/auth", name="auth", routes=auth.routes),
+        Mount("/login", name="login", routes=login.routes),
         Mount(
             "/static",
             name="static",
