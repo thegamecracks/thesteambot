@@ -1,5 +1,10 @@
 # thesteambot
 
+An experimental Discord application for fetching Steam connections from users.
+
+This is mostly a learning exercise for myself as I try to combine a webserver,
+OAuth2, and a Discord bot in the same project, so please don't use this in production!
+
 ## Requirements
 
 - Discord application in https://discord.com/developers/applications
