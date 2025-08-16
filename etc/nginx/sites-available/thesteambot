@@ -1,0 +1,31 @@
+# HTTPS redirect
+server {
+    server_name steam.thegamecracks.xyz;
+    listen 80;
+    listen [::]:80;
+
+    if ($host = steam.thegamecracks.xyz) {
+        return 301 https://$host$request_uri;
+    }
+
+    return 404;
+}
+
+# HTTPS reverse proxy to HTTP webserver
+server {
+    server_name steam.thegamecracks.xyz;
+    listen 443 ssl;
+    listen [::]:443 ssl;
+
+    location / {
+        # https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/
+        proxy_pass http://localhost:2500;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+}
