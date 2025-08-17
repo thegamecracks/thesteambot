@@ -13,6 +13,7 @@ from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
 from thesteambot.web import auth, login
+from thesteambot.web.lifespan import lifespan
 from thesteambot.web.templating import templates
 
 config = Config()
@@ -34,6 +35,7 @@ if DEBUG:
 
 app = Starlette(
     debug=DEBUG,
+    lifespan=lifespan,
     routes=[
         Route("/", homepage),
         Mount("/auth", name="auth", routes=auth.routes),
