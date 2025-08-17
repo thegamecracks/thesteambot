@@ -13,12 +13,12 @@ async def login_discord(request: Request) -> Response:
         assert discord is not None
 
         redirect_uri = request.url_for("auth", path="/discord")
-        scopes = ("connections", "identify")
+        scope = ("connections", "identify")
 
         return await discord.authorize_redirect(
             request,
             redirect_uri,
-            scopes=" ".join(scopes),
+            scope=scope,
             prompt="none",
         )
 
