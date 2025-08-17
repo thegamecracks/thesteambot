@@ -18,12 +18,14 @@ class DatabaseClient:
         *,
         access_token: str,
         token_type: str,
-        expires_in: float,
+        expires_in: float | datetime.timedelta,
         refresh_token: str,
         scope: str,
     ) -> None:
         now = datetime.datetime.now(datetime.timezone.utc)
-        expires_at = now + datetime.timedelta(seconds=expires_in)
+        if not isinstance(expires_in, datetime.timedelta):
+            expires_in = datetime.timedelta(seconds=expires_in)
+        expires_at = now + expires_in
 
         await self.conn.execute(
             "INSERT INTO discord_user (user_id) VALUES ($1) ON CONFLICT DO NOTHING",
