@@ -12,6 +12,64 @@ class DatabaseClient:
             user_id,
         )
 
+    async def add_discord_guild(self, guild_id: int) -> None:
+        await self.conn.execute(
+            "INSERT INTO discord_guild (guild_id) VALUES ($1) ON CONFLICT DO NOTHING",
+            guild_id,
+        )
+
+    async def add_discord_channel(
+        self, channel_id: int, *, guild_id: int | None
+    ) -> None:
+        await self.conn.execute(
+            "INSERT INTO discord_channel (channel_id, guild_id) VALUES ($1, $2) "
+            "ON CONFLICT DO NOTHING",
+            channel_id,
+            guild_id,
+        )
+
+    async def add_discord_member(self, *, guild_id: int, user_id: int) -> None:
+        await self.conn.execute(
+            "INSERT INTO discord_channel (guild_id, user_id) VALUES ($1, $2) "
+            "ON CONFLICT DO NOTHING",
+            guild_id,
+            user_id,
+        )
+
+    async def add_steam_user(self, user_id: int) -> None:
+        # Intentionally don't suppress conflicts, since this is normally
+        # an explicit step users have to do
+        await self.conn.execute(
+            "INSERT INTO steam_user (user_id) VALUES ($1)",
+            user_id,
+        )
+
+    async def add_discord_user_steam(self, user_id: int, *, steam_id: int) -> None:
+        # Intentionally don't suppress conflicts, since this is normally
+        # an explicit step users have to do
+        await self.conn.execute(
+            "INSERT INTO discord_user_steam (user_id, steam_id) VALUES ($1, $2)",
+            user_id,
+            steam_id,
+        )
+
+    async def add_discord_member_steam(
+        self,
+        *,
+        guild_id: int,
+        user_id: int,
+        steam_id: int,
+    ) -> None:
+        # Intentionally don't suppress conflicts, since this is normally
+        # an explicit step users have to do
+        await self.conn.execute(
+            "INSERT INTO discord_member_steam (guild_id, user_id, steam_id) "
+            "VALUES ($1, $2, $3)",
+            guild_id,
+            user_id,
+            steam_id,
+        )
+
     async def get_discord_oauth(self, user_id: int) -> asyncpg.Record | None:
         return await self.conn.fetchrow(
             "SELECT * FROM discord_oauth WHERE user_id = $1",
