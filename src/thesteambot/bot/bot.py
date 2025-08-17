@@ -29,6 +29,7 @@ class Bot(commands.Bot):
 
         super().__init__(
             command_prefix=commands.when_mentioned,
+            help_command=None,
             intents=intents,
         )
 
