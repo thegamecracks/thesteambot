@@ -1,7 +1,10 @@
 import asyncio
 import os
+from contextlib import asynccontextmanager
+from typing import AsyncIterator
 
 import discord
+import hikari
 
 from thesteambot.bot.bot import Bot
 from thesteambot.db.connection import create_pool
@@ -28,9 +31,19 @@ async def async_main() -> None:
 
     discord.utils.setup_logging(root=True)
 
-    async with create_pool() as pool:
-        bot = Bot(debug=debug, extensions=extensions, pool=pool)
+    async with create_pool() as pool, start_rest_app() as rest:
+        bot = Bot(debug=debug, extensions=extensions, pool=pool, rest=rest)
         await bot.start(token)
+
+
+@asynccontextmanager
+async def start_rest_app() -> AsyncIterator[hikari.RESTApp]:
+    rest = hikari.RESTApp()
+    await rest.start()
+    try:
+        yield rest
+    finally:
+        await rest.close()
 
 
 if __name__ == "__main__":

@@ -3,6 +3,7 @@ from typing import Sequence
 
 import asyncpg
 import discord
+import hikari
 from discord.ext import commands
 
 log = logging.getLogger(__name__)
@@ -15,6 +16,7 @@ class Bot(commands.Bot):
         debug: bool,
         extensions: Sequence[str],
         pool: asyncpg.Pool,
+        rest: hikari.RESTApp,
     ) -> None:
         intents = discord.Intents.default()
         intents.members = True
@@ -26,6 +28,7 @@ class Bot(commands.Bot):
 
         self.debug = debug
         self.pool = pool
+        self.rest = rest
         self._extensions_to_load = extensions
 
     async def setup_hook(self) -> None:
