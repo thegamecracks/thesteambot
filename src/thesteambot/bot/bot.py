@@ -18,6 +18,7 @@ class Bot(commands.Bot):
     def __init__(
         self,
         *,
+        base_url: str,
         debug: bool,
         extensions: Sequence[str],
         pool: asyncpg.Pool,
@@ -34,6 +35,7 @@ class Bot(commands.Bot):
         self.debug = debug
         self.pool = pool
         self.rest = rest
+        self._base_url = base_url
         self._extensions_to_load = extensions
 
     async def setup_hook(self) -> None:
@@ -57,6 +59,9 @@ class Bot(commands.Bot):
 
         async with rest_client:
             yield rest_client
+
+    def url_for(self, path: str) -> str:
+        return self._base_url + "/" + path.lstrip("/")
 
 
 class Context(commands.Context[Bot]): ...

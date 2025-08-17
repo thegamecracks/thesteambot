@@ -27,12 +27,19 @@ async def async_main() -> None:
     else:
         extensions = DEFAULT_EXTENSIONS
 
+    base_url = "https://{}".format(os.environ["DOMAIN"])
     token = os.environ["BOT_TOKEN"]
 
     discord.utils.setup_logging(root=True)
 
     async with create_pool() as pool, start_rest_app() as rest:
-        bot = Bot(debug=debug, extensions=extensions, pool=pool, rest=rest)
+        bot = Bot(
+            base_url=base_url,
+            debug=debug,
+            extensions=extensions,
+            pool=pool,
+            rest=rest,
+        )
         await bot.start(token)
 
 
