@@ -34,6 +34,8 @@ async def on_command_error(ctx: Context, error: commands.CommandError) -> None:
     elif isinstance(error, commands.BotMissingPermissions):
         perms = error.missing_permissions
         await ctx.reply(f"I am missing the following permissions: {perms}")
+    elif isinstance(error, commands.CommandOnCooldown):
+        await ctx.reply(f"This command is on cooldown for {error.retry_after:.1f}s.")
     elif isinstance(error, commands.CheckFailure):
         await ctx.reply("A check failed to pass before running this command.")
         if ctx.bot.debug:
@@ -88,6 +90,8 @@ async def on_app_command_error(
     elif isinstance(error, app_commands.BotMissingPermissions):
         perms = error.missing_permissions
         await send(f"I am missing the following permissions: {perms}")
+    elif isinstance(error, app_commands.CommandOnCooldown):
+        await send(f"This command is on cooldown for {error.retry_after:.1f}s.")
     elif isinstance(error, app_commands.CheckFailure):
         await send("A check failed to pass before running this command.")
         if interaction.client.debug:
