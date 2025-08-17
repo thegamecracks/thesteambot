@@ -1,3 +1,4 @@
+import datetime
 import asyncpg
 
 
@@ -21,24 +22,27 @@ class DatabaseClient:
         refresh_token: str,
         scope: str,
     ) -> None:
+        now = datetime.datetime.now(datetime.timezone.utc)
+        expires_at = now + datetime.timedelta(seconds=expires_in)
+
         await self.conn.execute(
             "INSERT INTO discord_user (user_id) VALUES ($1) ON CONFLICT DO NOTHING",
             user_id,
         )
         await self.conn.execute(
             "INSERT INTO discord_oauth "
-            "(user_id, access_token, token_type, expires_in, refresh_token, scope) "
+            "(user_id, access_token, token_type, expires_at, refresh_token, scope) "
             "VALUES ($1, $2, $3, $4, $5, $6) "
             "ON CONFLICT (user_id) DO UPDATE SET "
             "access_token = EXCLUDED.access_token, "
             "token_type = EXCLUDED.token_type, "
-            "expires_in = EXCLUDED.expires_in, "
+            "expires_at = EXCLUDED.expires_at, "
             "refresh_token = EXCLUDED.refresh_token, "
             "scope = EXCLUDED.scope",
             user_id,
             access_token,
             token_type,
-            expires_in,
+            expires_at,
             refresh_token,
             scope,
         )
