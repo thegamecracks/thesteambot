@@ -44,7 +44,7 @@ services:
   db-migrate:
     build:
       context: .
-    command: thesteambot.db.migrate
+    command: thesteambot.db.migrate --host db
     depends_on:
       db:
         condition: service_healthy

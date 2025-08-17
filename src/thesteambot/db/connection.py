@@ -7,18 +7,20 @@ import asyncpg
 
 def _get_connect_kwargs(
     *,
+    host: str | None = None,
+    port: int | None = None,
     user: str | None = None,
     password: str | None = None,
     database: str | None = None,
-    port: int | None = None,
 ) -> dict[str, Any]:
+    host = host or "localhost"
     user = user or os.environ["DB_USER"]
     password = password or os.environ["DB_PASSWORD"]
     database = database or os.environ["DB_DATABASE"]
     port = port or int(os.environ["DB_PORT"])
 
     return {
-        "host": "localhost",
+        "host": host,
         "user": user,
         "password": password,
         "database": database,
@@ -29,16 +31,18 @@ def _get_connect_kwargs(
 @asynccontextmanager
 async def connect(
     *,
+    host: str | None = None,
+    port: int | None = None,
     user: str | None = None,
     password: str | None = None,
     database: str | None = None,
-    port: int | None = None,
 ) -> AsyncIterator[asyncpg.Connection]:
     connect_kwargs = _get_connect_kwargs(
+        host=host,
+        port=port,
         user=user,
         password=password,
         database=database,
-        port=port,
     )
     conn = await asyncpg.connect(**connect_kwargs)
     try:
@@ -50,16 +54,18 @@ async def connect(
 @asynccontextmanager
 async def create_pool(
     *,
+    host: str | None = None,
+    port: int | None = None,
     user: str | None = None,
     password: str | None = None,
     database: str | None = None,
-    port: int | None = None,
 ) -> AsyncIterator[asyncpg.Pool]:
     connect_kwargs = _get_connect_kwargs(
+        host=host,
+        port=port,
         user=user,
         password=password,
         database=database,
-        port=port,
     )
     async with asyncpg.create_pool(**connect_kwargs) as pool:
         yield pool

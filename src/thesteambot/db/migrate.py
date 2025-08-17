@@ -1,3 +1,4 @@
+import argparse
 import asyncio
 import importlib.resources
 import re
@@ -13,12 +14,26 @@ package = importlib.resources.files(__package__)
 
 
 def main() -> None:
-    # TODO: support user/password/database/port arguments?
     asyncio.run(amain())
 
 
 async def amain() -> None:
-    async with connect() as conn:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--host")
+    parser.add_argument("--port", type=int)
+    parser.add_argument("--user")
+    parser.add_argument("--password")
+    parser.add_argument("--database")
+
+    args = parser.parse_args()
+
+    async with connect(
+        host=args.host,
+        port=args.port,
+        user=args.user,
+        password=args.password,
+        database=args.database,
+    ) as conn:
         await run_default_migrations(conn)
     print("Database is up to date! 🙂")
 
