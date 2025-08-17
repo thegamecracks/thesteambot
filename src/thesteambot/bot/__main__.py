@@ -1,14 +1,21 @@
+import asyncio
 import os
 
 from thesteambot.bot.bot import Bot
+from thesteambot.db.connection import create_pool
 
 
 def main() -> None:
+    asyncio.run(amain())
+
+
+async def amain() -> None:
     extensions = os.environ["BOT_EXTENSIONS"].split(",")
     token = os.environ["BOT_TOKEN"]
 
-    bot = Bot(extensions=extensions)
-    bot.run(token, root_logger=True)
+    async with create_pool() as pool:
+        bot = Bot(extensions=extensions, pool=pool)
+        bot.run(token, root_logger=True)
 
 
 if __name__ == "__main__":
