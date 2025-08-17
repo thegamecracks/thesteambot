@@ -5,7 +5,7 @@ import asyncpg
 from starlette.applications import Starlette
 from starlette.requests import Request
 
-from thesteambot.db.connection import create_pool
+from thesteambot.db import create_pool
 
 
 class State:
