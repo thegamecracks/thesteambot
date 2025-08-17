@@ -32,3 +32,6 @@ class Bot(commands.Bot):
         for extension in self._extensions_to_load:
             log.info(f"Loading extension {extension}")
             await self.load_extension(extension)
+
+
+class Context(commands.Context[Bot]): ...
