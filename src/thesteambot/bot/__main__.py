@@ -6,13 +6,20 @@ import discord
 from thesteambot.bot.bot import Bot
 from thesteambot.db.connection import create_pool
 
+DEFAULT_EXTENSIONS = ("jishaku",)
+
 
 def main() -> None:
     asyncio.run(async_main())
 
 
 async def async_main() -> None:
-    extensions = os.environ["BOT_EXTENSIONS"].split(",")
+    extensions = os.getenv("BOT_EXTENSIONS")
+    if extensions:
+        extensions = extensions.split(",")
+    else:
+        extensions = DEFAULT_EXTENSIONS
+
     token = os.environ["BOT_TOKEN"]
 
     discord.utils.setup_logging(root=True)
