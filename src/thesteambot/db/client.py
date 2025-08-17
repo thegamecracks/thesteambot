@@ -28,7 +28,7 @@ class DatabaseClient:
         await self.conn.execute(
             "INSERT INTO discord_oauth "
             "(user_id, access_token, token_type, expires_in, refresh_token, scope) "
-            "VALUES ($1, $2, $3, $4, $5) "
+            "VALUES ($1, $2, $3, $4, $5, $6) "
             "ON CONFLICT (user_id) DO UPDATE SET "
             "access_token = EXCLUDED.access_token, "
             "token_type = EXCLUDED.token_type, "
