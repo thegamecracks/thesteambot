@@ -4,10 +4,13 @@ from discord import app_commands
 from discord.ext import commands
 
 from thesteambot.bot.bot import Bot, Context
-from thesteambot.bot.errors import CommandResponse
+from thesteambot.bot.errors import CommandResponse, DiscordOAuthError
+from thesteambot.bot.views import View
 
 
 async def on_command_error(ctx: Context, error: commands.CommandError) -> None:
+    original = getattr(error, "original", error)
+
     # Invalid commands
     if isinstance(error, commands.CommandNotFound):
         pass
@@ -39,6 +42,16 @@ async def on_command_error(ctx: Context, error: commands.CommandError) -> None:
     elif isinstance(error, CommandResponse):
         if message := str(error):
             await ctx.reply(message)
+    elif isinstance(original, DiscordOAuthError):
+        await ctx.reply(
+            "You must authorize us with Discord to use this command! "
+            "Click the button below and authorize us first, and then "
+            "re-run the command.",
+            delete_after=60,
+            view=DiscordAuthorizeView(ctx.bot),
+        )
+        if ctx.bot.debug:
+            raise error
     else:
         await ctx.reply("An unknown error occurred while running this command.")
         raise error
@@ -49,6 +62,8 @@ async def on_app_command_error(
     error: app_commands.AppCommandError,
 ) -> None:
     send = functools.partial(interaction_send, interaction)
+    original = getattr(error, "original", error)
+
     # Invalid commands
     if isinstance(
         error,
@@ -81,6 +96,16 @@ async def on_app_command_error(
     elif isinstance(error, CommandResponse):
         if message := str(error):
             await send(message)
+    elif isinstance(original, DiscordOAuthError):
+        await send(
+            "You must authorize us with Discord to use this command! "
+            "Click the button below and authorize us first, and then "
+            "re-run the command.",
+            ephemeral=True,
+            view=DiscordAuthorizeView(interaction.client),
+        )
+        if interaction.client.debug:
+            raise error
     else:
         await send("An unknown error occurred while running this command.")
         raise error
@@ -92,6 +117,17 @@ async def interaction_send(interaction: discord.Interaction, *args, **kwargs) ->
     else:
         kwargs.setdefault("ephemeral", True)
         await interaction.response.send_message(*args, **kwargs)
+
+
+class DiscordAuthorizeView(View):
+    def __init__(self, bot: Bot):
+        super().__init__()
+        self.add_item(
+            discord.ui.Button(
+                label="Authorize",
+                url=bot.url_for("/login/discord"),
+            )
+        )
 
 
 class Errors(commands.Cog):
