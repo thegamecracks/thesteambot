@@ -14,10 +14,10 @@ package = importlib.resources.files(__package__)
 
 
 def main() -> None:
-    asyncio.run(amain())
+    asyncio.run(async_main())
 
 
-async def amain() -> None:
+async def async_main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--host")
     parser.add_argument("--port", type=int)

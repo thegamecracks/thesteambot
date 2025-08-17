@@ -6,10 +6,10 @@ from thesteambot.db.connection import create_pool
 
 
 def main() -> None:
-    asyncio.run(amain())
+    asyncio.run(async_main())
 
 
-async def amain() -> None:
+async def async_main() -> None:
     extensions = os.environ["BOT_EXTENSIONS"].split(",")
     token = os.environ["BOT_TOKEN"]
 
