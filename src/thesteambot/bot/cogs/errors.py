@@ -5,7 +5,7 @@ from discord.ext import commands
 
 from thesteambot.bot.bot import Bot, Context
 from thesteambot.bot.errors import CommandResponse, DiscordOAuthError
-from thesteambot.bot.views import View
+from thesteambot.bot.views import DiscordAuthorizeView
 
 
 async def on_command_error(ctx: Context, error: commands.CommandError) -> None:
@@ -117,17 +117,6 @@ async def interaction_send(interaction: discord.Interaction, *args, **kwargs) ->
     else:
         kwargs.setdefault("ephemeral", True)
         await interaction.response.send_message(*args, **kwargs)
-
-
-class DiscordAuthorizeView(View):
-    def __init__(self, bot: Bot):
-        super().__init__()
-        self.add_item(
-            discord.ui.Button(
-                label="Authorize",
-                url=bot.url_for("/login/discord"),
-            )
-        )
 
 
 class Errors(commands.Cog):
