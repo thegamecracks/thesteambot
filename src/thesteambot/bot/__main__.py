@@ -14,6 +14,7 @@ def main() -> None:
 
 
 async def async_main() -> None:
+    debug = os.getenv("DEBUG") not in (None, "", "0")
     extensions = os.getenv("BOT_EXTENSIONS")
     if extensions:
         extensions = extensions.split(",")
@@ -25,7 +26,7 @@ async def async_main() -> None:
     discord.utils.setup_logging(root=True)
 
     async with create_pool() as pool:
-        bot = Bot(extensions=extensions, pool=pool)
+        bot = Bot(debug=debug, extensions=extensions, pool=pool)
         await bot.start(token)
 
 

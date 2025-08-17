@@ -9,7 +9,13 @@ log = logging.getLogger(__name__)
 
 
 class Bot(commands.Bot):
-    def __init__(self, *, extensions: Sequence[str], pool: asyncpg.Pool) -> None:
+    def __init__(
+        self,
+        *,
+        debug: bool,
+        extensions: Sequence[str],
+        pool: asyncpg.Pool,
+    ) -> None:
         intents = discord.Intents.default()
         intents.members = True
 
@@ -18,6 +24,7 @@ class Bot(commands.Bot):
             intents=intents,
         )
 
+        self.debug = debug
         self.pool = pool
         self._extensions_to_load = extensions
 
