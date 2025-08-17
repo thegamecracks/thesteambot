@@ -1,8 +1,13 @@
 import os
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Any, AsyncIterator
 
 import asyncpg
+
+
+def _is_dockerized() -> bool:
+    return Path("/.dockerenv").exists()
 
 
 def _get_connect_kwargs(
@@ -13,7 +18,7 @@ def _get_connect_kwargs(
     password: str | None = None,
     database: str | None = None,
 ) -> dict[str, Any]:
-    host = host or "localhost"
+    host = host or "db" if _is_dockerized() else "localhost"
     user = user or os.environ["DB_USER"]
     password = password or os.environ["DB_PASSWORD"]
     database = database or os.environ["DB_DATABASE"]
