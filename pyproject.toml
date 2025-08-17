@@ -20,4 +20,5 @@ dependencies = [
 
 [project.scripts]
 thesteambot-bot = "thesteambot.bot.__main__:main"
+thesteambot-db-migrate = "thesteambot.db.migrate:main"
 thesteambot-web = "thesteambot.web.__main__:main"

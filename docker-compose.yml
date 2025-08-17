@@ -5,6 +5,7 @@ services:
     command: thesteambot.bot
     depends_on:
       - db
+      - db-migrate
     develop:
       watch:
         - path: packages/bot/
@@ -38,12 +39,21 @@ services:
     restart: always
     volumes:
       - db-data:/var/lib/postgresql
+  db-migrate:
+    build:
+      context: .
+    command: thesteambot.db.migrate
+    depends_on:
+      - db
+    env_file:
+      - .env
   web:
     build:
       context: .
     command: thesteambot.web
     depends_on:
       - db
+      - db-migrate
     develop:
       watch:
         - path: packages/web/src/thesteambot/web/static/

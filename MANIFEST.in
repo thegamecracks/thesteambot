@@ -1,1 +1,1 @@
-recursive-include src *.css *.j2
+recursive-include src *.css *.j2 *.sql
