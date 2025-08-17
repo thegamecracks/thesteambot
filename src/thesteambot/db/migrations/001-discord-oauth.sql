@@ -7,7 +7,7 @@ CREATE TABLE discord_oauth (
     user_id BIGINT PRIMARY KEY REFERENCES discord_user (user_id),
     access_token TEXT NOT NULL,
     token_type TEXT NOT NULL,
-    expires_at TIMESTAMP NOT NULL,
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
     refresh_token TEXT NOT NULL,
     scope TEXT NOT NULL
 );
