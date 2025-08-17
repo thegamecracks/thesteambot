@@ -6,7 +6,10 @@ import discord
 from thesteambot.bot.bot import Bot
 from thesteambot.db.connection import create_pool
 
-DEFAULT_EXTENSIONS = ("jishaku",)
+DEFAULT_EXTENSIONS = (
+    "thesteambot.bot.cogs.errors",
+    "jishaku",
+)
 
 
 def main() -> None:
