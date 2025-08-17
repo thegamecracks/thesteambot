@@ -13,7 +13,7 @@ class Bot(commands.Bot):
         intents.members = True
 
         super().__init__(
-            command_prefix="xkcd",
+            command_prefix=commands.when_mentioned,
             intents=intents,
         )
 
