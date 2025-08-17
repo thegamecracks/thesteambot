@@ -46,3 +46,9 @@ class DatabaseClient:
             refresh_token,
             scope,
         )
+
+    async def delete_discord_oauth(self, user_id: int) -> None:
+        await self.conn.execute(
+            "DELETE FROM discord_oauth WHERE user_id = $1",
+            user_id,
+        )
