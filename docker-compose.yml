@@ -4,8 +4,10 @@ services:
       context: .
     command: thesteambot.bot
     depends_on:
-      - db
-      - db-migrate
+      db:
+        condition: service_healthy
+      db-migrate:
+        condition: service_completed_successfully
     develop:
       watch:
         - path: packages/bot/
@@ -44,7 +46,8 @@ services:
       context: .
     command: thesteambot.db.migrate
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     env_file:
       - .env
   web:
@@ -52,8 +55,10 @@ services:
       context: .
     command: thesteambot.web
     depends_on:
-      - db
-      - db-migrate
+      db:
+        condition: service_healthy
+      db-migrate:
+        condition: service_completed_successfully
     develop:
       watch:
         - path: packages/web/src/thesteambot/web/static/
