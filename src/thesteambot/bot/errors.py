@@ -1,3 +1,4 @@
+import discord
 from discord import app_commands
 from discord.ext import commands
 
@@ -29,3 +30,11 @@ class MissingDiscordOAuthError(DiscordOAuthError):
 
     def __init__(self, user_id: int) -> None:
         super().__init__(user_id, "No authorization found for user")
+
+
+class MissingSteamUserError(Exception):
+    """Raised when the bot cannot retrieve any Steam accounts for the given user."""
+
+    def __init__(self, user: discord.User | discord.Member, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.user = user

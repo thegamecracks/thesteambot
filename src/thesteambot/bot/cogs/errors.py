@@ -4,7 +4,11 @@ from discord import app_commands
 from discord.ext import commands
 
 from thesteambot.bot.bot import Bot, Context
-from thesteambot.bot.errors import CommandResponse, DiscordOAuthError
+from thesteambot.bot.errors import (
+    CommandResponse,
+    DiscordOAuthError,
+    MissingSteamUserError,
+)
 from thesteambot.bot.views import DiscordAuthorizeView
 
 
@@ -51,6 +55,16 @@ async def on_command_error(ctx: Context, error: commands.CommandError) -> None:
             "Please click the button below to grant us authorization, then try again.",
             delete_after=60,
             view=DiscordAuthorizeView(ctx.bot),
+        )
+        if ctx.bot.debug:
+            raise error
+    elif isinstance(original, MissingSteamUserError):
+        await ctx.reply(
+            "You must have a Steam account connected with Discord to use this command!\n"
+            "\n"
+            "Please go to your Discord settings > Connections and add your "
+            "Steam account, then try again.",
+            delete_after=60,
         )
         if ctx.bot.debug:
             raise error
@@ -107,6 +121,16 @@ async def on_app_command_error(
             "Please click the button below to grant us authorization, then try again.",
             ephemeral=True,
             view=DiscordAuthorizeView(interaction.client),
+        )
+        if interaction.client.debug:
+            raise error
+    elif isinstance(original, MissingSteamUserError):
+        await send(
+            "You must have a Steam account connected with Discord to use this command!\n"
+            "\n"
+            "Please go to your Discord settings > Connections and add your "
+            "Steam account, then try again.",
+            ephemeral=True,
         )
         if interaction.client.debug:
             raise error
