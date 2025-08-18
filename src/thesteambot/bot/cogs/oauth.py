@@ -71,7 +71,10 @@ class ManageSteamUserView(CancellableView):
             await interaction.response.send_message(
                 f"{name} has not yet been connected with us.\n"
                 "Would you like to connect this Steam account? "
-                "You can undo this afterwards by selecting the account again.",
+                "You can undo this afterwards by selecting the account again.\n"
+                "\n"
+                "Connecting will allow us to show your Steam account to other users, "
+                "even if you have otherwise hidden the account on your profile.",
                 ephemeral=True,
                 view=view,
             )
