@@ -9,7 +9,7 @@ from discord.ext import commands
 from hikari.api import RESTClient
 
 from thesteambot.bot.oauth import acquire_rest_client
-from thesteambot.db import DatabaseClient
+from thesteambot.db import Connection, DatabaseClient
 
 log = logging.getLogger(__name__)
 
@@ -43,6 +43,28 @@ class Bot(commands.Bot):
         for extension in self._extensions_to_load:
             log.info(f"Loading extension {extension}")
             await self.load_extension(extension)
+
+    @asynccontextmanager
+    async def acquire_db_conn(
+        self,
+        *,
+        transaction: bool = True,
+    ) -> AsyncIterator[Connection]:
+        async with self.pool.acquire() as conn:
+            if transaction:
+                async with conn.transaction():
+                    yield conn
+            else:
+                yield conn
+
+    @asynccontextmanager
+    async def acquire_db_client(
+        self,
+        *,
+        transaction: bool = True,
+    ) -> AsyncIterator[DatabaseClient]:
+        async with self.acquire_db_conn(transaction=transaction) as conn:
+            yield DatabaseClient(conn)
 
     @asynccontextmanager
     async def acquire_rest_client(

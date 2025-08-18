@@ -15,7 +15,7 @@ class Cleanup(commands.Cog):
 
     # @commands.Cog.listener("on_guild_remove")
     # async def remove_guild(self, guild: discord.Guild):
-    #     async with self.bot.pool.acquire() as conn:
+    #     async with self.bot.acquire_db_conn() as conn:
     #         await conn.execute("DELETE FROM discord_guild WHERE guild_id = ?", guild.id)
     #
     # In case the bot is unintentionally kicked, retain all data
@@ -23,21 +23,21 @@ class Cleanup(commands.Cog):
 
     @commands.Cog.listener("on_guild_channel_delete")
     async def remove_guild_channel(self, channel: discord.abc.GuildChannel) -> None:
-        async with self.bot.pool.acquire() as conn:
+        async with self.bot.acquire_db_conn() as conn:
             await conn.execute(
                 "DELETE FROM discord_channel WHERE channel_id = $1", channel.id
             )
 
     @commands.Cog.listener("on_raw_thread_delete")
     async def remove_thread(self, payload: discord.RawThreadDeleteEvent) -> None:
-        async with self.bot.pool.acquire() as conn:
+        async with self.bot.acquire_db_conn() as conn:
             await conn.execute(
                 "DELETE FROM discord_channel WHERE channel_id = $1", payload.thread_id
             )
 
     @commands.Cog.listener("on_raw_member_remove")
     async def remove_member(self, payload: discord.RawMemberRemoveEvent) -> None:
-        async with self.bot.pool.acquire() as conn:
+        async with self.bot.acquire_db_conn() as conn:
             await conn.execute(
                 "DELETE FROM discord_member WHERE guild_id = $1 AND user_id = $2",
                 payload.guild_id,
@@ -55,7 +55,7 @@ class Cleanup(commands.Cog):
     async def cleanup_guilds(self) -> None:
         # NOTE: this is incompatible with sharding
         guild_ids = {guild.id for guild in self.bot.guilds}
-        async with self.bot.pool.acquire() as conn:
+        async with self.bot.acquire_db_conn() as conn:
             rows = await conn.fetch("SELECT guild_id FROM discord_guild")
             rows = {row[0] for row in rows}
             deleted = rows - guild_ids
