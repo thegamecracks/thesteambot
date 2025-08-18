@@ -36,7 +36,7 @@ async def authorize_discord(request: Request) -> Response:
     async with client:
         user = await client.fetch_my_user()
 
-    async with state.pool.acquire() as conn:
+    async with state.pool.acquire() as conn, conn.transaction():
         client = DatabaseClient(conn)
         await client.set_discord_oauth(
             user.id,
