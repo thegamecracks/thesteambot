@@ -30,6 +30,24 @@ class View(discord.ui.View):
             await interaction.response.send_message(message, ephemeral=True)
 
 
+class CancellableView(discord.ui.View):
+    last_interaction: discord.Interaction | None = None
+
+    def set_last_interaction(self, interaction: discord.Interaction) -> None:
+        self.last_interaction = interaction
+
+    async def delete(self) -> None:
+        self.stop()
+        interaction = self.last_interaction
+        if interaction is not None and not interaction.is_expired():
+            await interaction.delete_original_response()
+
+    async def on_timeout(self) -> None:
+        interaction = self.last_interaction
+        if interaction is not None and not interaction.is_expired():
+            await interaction.delete_original_response()
+
+
 class DiscordAuthorizeView(View):
     def __init__(self, bot: Bot):
         super().__init__()
