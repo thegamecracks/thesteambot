@@ -1,9 +1,10 @@
 import datetime
-import asyncpg
+
+from thesteambot.db.protocols import Connection, Record
 
 
 class DatabaseClient:
-    def __init__(self, conn: asyncpg.Connection) -> None:
+    def __init__(self, conn: Connection) -> None:
         self.conn = conn
 
     async def add_discord_user(self, user_id: int) -> None:
@@ -70,7 +71,7 @@ class DatabaseClient:
             steam_id,
         )
 
-    async def get_discord_oauth(self, user_id: int) -> asyncpg.Record | None:
+    async def get_discord_oauth(self, user_id: int) -> Record | None:
         return await self.conn.fetchrow(
             "SELECT * FROM discord_oauth WHERE user_id = $1",
             user_id,
