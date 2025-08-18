@@ -97,7 +97,11 @@ class AddSteamUserView(CancellableView):
         button: discord.ui.Button,
     ) -> None:
         async with self.bot.acquire_db_client() as db_client:
-            await db_client.delete_steam_user(self.steam_id)
+            await db_client.add_steam_user(self.steam_id)
+            await db_client.add_discord_user_steam(
+                interaction.user.id,
+                steam_id=self.steam_id,
+            )
 
         await interaction.response.edit_message(
             content=f"Successfully connected the Steam account, {self.steam_name}!",
