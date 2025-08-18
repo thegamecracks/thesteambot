@@ -1,4 +1,5 @@
 import datetime
+from typing import Sequence
 
 from thesteambot.db.protocols import Connection, Record
 
@@ -45,6 +46,9 @@ class DatabaseClient:
             user_id,
         )
 
+    async def delete_steam_user(self, user_id: int) -> None:
+        await self.conn.execute("DELETE FROM steam_user WHERE user_id = $1", user_id)
+
     async def add_discord_user_steam(self, user_id: int, *, steam_id: int) -> None:
         # Intentionally don't suppress conflicts, since this is normally
         # an explicit step users have to do
@@ -52,6 +56,12 @@ class DatabaseClient:
             "INSERT INTO discord_user_steam (user_id, steam_id) VALUES ($1, $2)",
             user_id,
             steam_id,
+        )
+
+    async def get_discord_user_steam(self, user_id: int) -> Sequence[Record]:
+        return await self.conn.fetch(
+            "SELECT * FROM discord_user_steam WHERE user_id = $1",
+            user_id,
         )
 
     async def add_discord_member_steam(
