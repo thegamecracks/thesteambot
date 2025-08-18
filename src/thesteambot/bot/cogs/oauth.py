@@ -222,7 +222,11 @@ class OAuth(
             steam_names,
         )
         view.set_last_interaction(interaction)
-        await interaction.response.send_message("Available Steam accounts:", view=view)
+        await interaction.response.send_message(
+            "Available Steam accounts:",
+            ephemeral=True,
+            view=view,
+        )
 
 
 async def setup(bot: Bot) -> None:
