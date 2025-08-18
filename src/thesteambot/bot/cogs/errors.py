@@ -46,9 +46,9 @@ async def on_command_error(ctx: Context, error: commands.CommandError) -> None:
             await ctx.reply(message)
     elif isinstance(original, DiscordOAuthError):
         await ctx.reply(
-            "You must authorize us with Discord to use this command! "
-            "Click the button below and authorize us first, and then "
-            "re-run the command.",
+            "You must authorize us with Discord to use this command!\n"
+            "\n"
+            "Please click the button below to grant us authorization, then try again.",
             delete_after=60,
             view=DiscordAuthorizeView(ctx.bot),
         )
@@ -102,9 +102,9 @@ async def on_app_command_error(
             await send(message)
     elif isinstance(original, DiscordOAuthError):
         await send(
-            "You must authorize us with Discord to use this command! "
-            "Click the button below and authorize us first, and then "
-            "re-run the command.",
+            "You must authorize us with Discord to use this command!\n"
+            "\n"
+            "Please click the button below to grant us authorization, then try again.",
             ephemeral=True,
             view=DiscordAuthorizeView(interaction.client),
         )
