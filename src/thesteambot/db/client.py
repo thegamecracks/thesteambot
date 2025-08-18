@@ -32,7 +32,7 @@ class DatabaseClient:
 
     async def add_discord_member(self, *, guild_id: int, user_id: int) -> None:
         await self.conn.execute(
-            "INSERT INTO discord_channel (guild_id, user_id) VALUES ($1, $2) "
+            "INSERT INTO discord_member (guild_id, user_id) VALUES ($1, $2) "
             "ON CONFLICT DO NOTHING",
             guild_id,
             user_id,
