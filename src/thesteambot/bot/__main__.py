@@ -18,7 +18,10 @@ DEFAULT_EXTENSIONS = (
 
 
 def main() -> None:
-    asyncio.run(async_main())
+    try:
+        asyncio.run(async_main())
+    except KeyboardInterrupt:
+        pass
 
 
 async def async_main() -> None:
