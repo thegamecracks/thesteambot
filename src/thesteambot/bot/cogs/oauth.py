@@ -1,3 +1,5 @@
+from typing import NamedTuple
+
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -14,22 +16,28 @@ async def get_steam_ids(db_client: DatabaseClient, user_id: int):
     return current_steam_ids
 
 
+class SteamConnection(NamedTuple):
+    id: int
+    name: str
+    public: bool
+
+
 class ManageSteamUserView(CancellableView):
     def __init__(
         self,
         bot: Bot,
         user_id: int,
         steam_ids: set[int],
-        steam_names: dict[int, str],
+        connections: dict[int, SteamConnection],
     ) -> None:
         super().__init__()
         self.bot = bot
         self.user_id = user_id
         self.steam_ids = steam_ids
-        self.steam_names = steam_names
+        self.connections = connections
         self.on_select.options = [
             discord.SelectOption(
-                label=steam_names.get(steam_id, str(steam_id)),
+                label=c.name if (c := connections.get(steam_id)) else str(steam_id),
                 value=str(steam_id),
             )
             for steam_id in steam_ids
@@ -51,8 +59,11 @@ class ManageSteamUserView(CancellableView):
             current = {row["steam_id"]: row for row in rows}
 
         selected = int(select.values[0])
-        name = self.steam_names.get(selected)
-        name = f"{name} (ID {selected})" if name is not None else f"{selected}"
+        connection = self.connections.get(selected)
+        if connection is not None:
+            name = f"{connection.name} (ID {connection.id})"
+        else:
+            name = f"{selected}"
 
         if selected not in current:
             view = AddSteamUserView(self.bot, interaction.user.id, selected, name)
@@ -207,19 +218,26 @@ class OAuth(
             connections = await client.fetch_my_connections()
 
         connections = [c for c in connections if c.type == "steam"]
-        steam_names = {int(c.id): c.name for c in connections}
+        connections = {
+            int(c.id): SteamConnection(
+                id=int(c.id),
+                name=c.name,
+                public=c.visibility == 1,
+            )
+            for c in connections
+        }
 
         async with self.bot.acquire_db_client() as db_client:
             current_steam_ids = await get_steam_ids(db_client, interaction.user.id)
 
-        if not steam_names and not current_steam_ids:
+        if not connections and not current_steam_ids:
             raise MissingSteamUserError(interaction.user)
 
         view = ManageSteamUserView(
             self.bot,
             interaction.user.id,
-            current_steam_ids | set(steam_names),
-            steam_names,
+            current_steam_ids | set(connections),
+            connections,
         )
         view.set_last_interaction(interaction)
         await interaction.response.send_message(
