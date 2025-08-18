@@ -11,6 +11,7 @@ from thesteambot.db.connection import create_pool
 
 DEFAULT_EXTENSIONS = (
     "thesteambot.bot.cogs.errors",
+    "thesteambot.bot.cogs.oauth",
     "jishaku",
 )
 
