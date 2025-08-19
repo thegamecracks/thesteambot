@@ -8,10 +8,9 @@ from discord.ext import commands
 from thesteambot.bot.bot import Bot, Context
 from thesteambot.bot.errors import (
     CommandResponse,
-    DiscordOAuthError,
-    ExpiredDiscordOAuthError,
     MissingSteamUserError,
 )
+from thesteambot.oauth import DiscordOAuthError, ExpiredDiscordOAuthError
 from thesteambot.bot.views import DiscordAuthorizeView
 
 log = logging.getLogger(__name__)

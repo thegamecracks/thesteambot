@@ -2,22 +2,18 @@ from __future__ import annotations
 
 import datetime
 import os
-from contextlib import asynccontextmanager
-from typing import TYPE_CHECKING, AsyncIterator
+from contextlib import AbstractAsyncContextManager, asynccontextmanager
+from typing import AsyncIterator, Callable
 
-import discord
 import hikari
 from hikari.impl import RESTClientImpl
 
-from thesteambot.bot.errors import (
+from thesteambot.db.client import DatabaseClient
+from thesteambot.oauth.errors import (
     DiscordOAuthError,
     ExpiredDiscordOAuthError,
     MissingDiscordOAuthError,
 )
-
-if TYPE_CHECKING:
-    from thesteambot.bot.bot import Bot
-    from thesteambot.db.client import DatabaseClient
 
 
 async def acquire_rest_client(
@@ -54,7 +50,7 @@ async def maybe_refresh_access_token(
     refresh_token: str,
     scope: str,
 ) -> tuple[str, str]:
-    now = discord.utils.utcnow()
+    now = datetime.datetime.now(datetime.timezone.utc)
     if (expires_at - now).total_seconds() > 60:
         return access_token, token_type
 
@@ -116,7 +112,7 @@ async def refresh_access_token(
 
 @asynccontextmanager
 async def wrap_rest_client(
-    bot: Bot,
+    acquire_db_client: Callable[[], AbstractAsyncContextManager[DatabaseClient]],
     client: RESTClientImpl,
     user_id: int,
 ) -> AsyncIterator[RESTClientImpl]:
@@ -132,7 +128,7 @@ async def wrap_rest_client(
             # received 401, the inner-most client would be the first to hit
             # this try-except. As a result, we may end up invalidating someone
             # else's login even though they weren't the one that caused the 401.
-            async with bot.acquire_db_client() as db_client:
+            async with acquire_db_client() as db_client:
                 await db_client.delete_discord_oauth(user_id)
 
             raise ExpiredDiscordOAuthError(user_id) from e

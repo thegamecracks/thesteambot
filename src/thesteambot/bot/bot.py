@@ -8,7 +8,7 @@ import hikari
 from discord.ext import commands
 from hikari.api import RESTClient
 
-from thesteambot.bot.oauth import acquire_rest_client, wrap_rest_client
+from thesteambot.oauth import acquire_rest_client, wrap_rest_client
 from thesteambot.db import Connection, DatabaseClient
 
 log = logging.getLogger(__name__)
@@ -80,7 +80,8 @@ class Bot(commands.Bot):
             db_client = DatabaseClient(conn)
             rest_client = await acquire_rest_client(self.rest, db_client, user_id)
 
-        async with wrap_rest_client(self, rest_client, user_id) as rest_client:
+        wrapped = wrap_rest_client(self.acquire_db_client, rest_client, user_id)
+        async with wrapped as rest_client:
             yield rest_client
 
     def url_for(self, path: str) -> str:

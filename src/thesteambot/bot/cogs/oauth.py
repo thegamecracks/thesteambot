@@ -5,9 +5,10 @@ from discord import app_commands
 from discord.ext import commands
 
 from thesteambot.bot.bot import Bot
-from thesteambot.bot.errors import DiscordOAuthError, MissingSteamUserError
+from thesteambot.bot.errors import MissingSteamUserError
 from thesteambot.bot.views import CancellableView, DiscordAuthorizeView
 from thesteambot.db.client import DatabaseClient
+from thesteambot.oauth import DiscordOAuthError
 
 
 async def get_steam_ids(db_client: DatabaseClient, user_id: int):
