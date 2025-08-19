@@ -1,4 +1,6 @@
 import functools
+import logging
+
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -10,6 +12,8 @@ from thesteambot.bot.errors import (
     MissingSteamUserError,
 )
 from thesteambot.bot.views import DiscordAuthorizeView
+
+log = logging.getLogger(__name__)
 
 
 async def on_command_error(ctx: Context, error: commands.CommandError) -> None:
@@ -24,7 +28,7 @@ async def on_command_error(ctx: Context, error: commands.CommandError) -> None:
     elif isinstance(error, commands.ConversionError):
         await ctx.reply("I could not parse your input.")
         if ctx.bot.debug:
-            raise error
+            log_command_error(ctx, error)
     elif isinstance(error, commands.UserInputError):
         await ctx.reply(f"Could not parse your input: {error}")
     # Checks
@@ -43,7 +47,7 @@ async def on_command_error(ctx: Context, error: commands.CommandError) -> None:
     elif isinstance(error, commands.CheckFailure):
         await ctx.reply("A check failed to pass before running this command.")
         if ctx.bot.debug:
-            raise error
+            log_command_error(ctx, error)
     # Runtime errors
     elif isinstance(error, CommandResponse):
         if message := str(error):
@@ -57,7 +61,7 @@ async def on_command_error(ctx: Context, error: commands.CommandError) -> None:
             view=DiscordAuthorizeView(ctx.bot),
         )
         if ctx.bot.debug:
-            raise error
+            log_command_error(ctx, error)
     elif isinstance(original, MissingSteamUserError):
         await ctx.reply(
             "You must have a Steam account connected with Discord to use this command!\n"
@@ -67,10 +71,14 @@ async def on_command_error(ctx: Context, error: commands.CommandError) -> None:
             delete_after=60,
         )
         if ctx.bot.debug:
-            raise error
+            log_command_error(ctx, error)
     else:
         await ctx.reply("An unknown error occurred while running this command.")
-        raise error
+        log_command_error(ctx, error)
+
+
+def log_command_error(ctx: Context, error: commands.CommandError) -> None:
+    log.exception(f"Exception occurred in command {ctx.command!r}", exc_info=error)
 
 
 async def on_app_command_error(
@@ -89,12 +97,12 @@ async def on_app_command_error(
         ),
     ):
         await send("I do not recognize this command anymore. Sorry!")
-        raise error
+        log_app_command_error(interaction, error)
     # User input
     elif isinstance(error, app_commands.TransformerError):
         await send("I could not parse your input.")
         if interaction.client.debug:
-            raise error
+            log_app_command_error(interaction, error)
     # Checks
     elif isinstance(error, app_commands.NoPrivateMessage):
         await send("This command must be used in a server.")
@@ -109,7 +117,7 @@ async def on_app_command_error(
     elif isinstance(error, app_commands.CheckFailure):
         await send("A check failed to pass before running this command.")
         if interaction.client.debug:
-            raise error
+            log_app_command_error(interaction, error)
     # Runtime errors
     elif isinstance(error, CommandResponse):
         if message := str(error):
@@ -123,7 +131,7 @@ async def on_app_command_error(
             view=DiscordAuthorizeView(interaction.client),
         )
         if interaction.client.debug:
-            raise error
+            log_app_command_error(interaction, error)
     elif isinstance(original, MissingSteamUserError):
         await send(
             "You must have a Steam account connected with Discord to use this command!\n"
@@ -133,10 +141,21 @@ async def on_app_command_error(
             ephemeral=True,
         )
         if interaction.client.debug:
-            raise error
+            log_app_command_error(interaction, error)
     else:
         await send("An unknown error occurred while running this command.")
-        raise error
+        log_app_command_error(interaction, error)
+
+
+def log_app_command_error(
+    interaction: discord.Interaction,
+    error: app_commands.AppCommandError,
+) -> None:
+    command = interaction.command.qualified_name if interaction.command else None
+    log.exception(
+        f"Exception occurred in application command {command!r}",
+        exc_info=error,
+    )
 
 
 async def interaction_send(interaction: discord.Interaction, *args, **kwargs) -> None:
