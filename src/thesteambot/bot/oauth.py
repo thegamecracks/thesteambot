@@ -1,12 +1,23 @@
+from __future__ import annotations
+
 import datetime
 import os
+from contextlib import asynccontextmanager
+from typing import TYPE_CHECKING, AsyncIterator
 
 import discord
 import hikari
 from hikari.impl import RESTClientImpl
 
-from thesteambot.bot.errors import DiscordOAuthError, MissingDiscordOAuthError
-from thesteambot.db.client import DatabaseClient
+from thesteambot.bot.errors import (
+    DiscordOAuthError,
+    ExpiredDiscordOAuthError,
+    MissingDiscordOAuthError,
+)
+
+if TYPE_CHECKING:
+    from thesteambot.bot.bot import Bot
+    from thesteambot.db.client import DatabaseClient
 
 
 async def acquire_rest_client(
@@ -101,3 +112,27 @@ async def refresh_access_token(
         scope=" ".join(sorted(new_scopes)),
     )
     return token.access_token, str(token.token_type)
+
+
+@asynccontextmanager
+async def wrap_rest_client(
+    bot: Bot,
+    client: RESTClientImpl,
+    user_id: int,
+) -> AsyncIterator[RESTClientImpl]:
+    async with client:
+        try:
+            yield client
+        except hikari.UnauthorizedError as e:
+            # FIXME: Improve Discord OAuth invalidation for 401 responses
+            #
+            # We don't have enough information in this error to know if it
+            # was our client that threw the error, or a different client.
+            # For example, if we entered two clients and the outer client
+            # received 401, the inner-most client would be the first to hit
+            # this try-except. As a result, we may end up invalidating someone
+            # else's login even though they weren't the one that caused the 401.
+            async with bot.acquire_db_client() as db_client:
+                await db_client.delete_discord_oauth(user_id)
+
+            raise ExpiredDiscordOAuthError(user_id) from e

@@ -9,6 +9,7 @@ from thesteambot.bot.bot import Bot, Context
 from thesteambot.bot.errors import (
     CommandResponse,
     DiscordOAuthError,
+    ExpiredDiscordOAuthError,
     MissingSteamUserError,
 )
 from thesteambot.bot.views import DiscordAuthorizeView
@@ -52,6 +53,16 @@ async def on_command_error(ctx: Context, error: commands.CommandError) -> None:
     elif isinstance(error, CommandResponse):
         if message := str(error):
             await ctx.reply(message)
+    elif isinstance(original, ExpiredDiscordOAuthError):
+        await ctx.reply(
+            "We've been deauthorized from Discord and require you to re-authorize us.\n"
+            "\n"
+            "Please click the button below to grant us authorization, then try again.",
+            ephemeral=True,
+            view=DiscordAuthorizeView(ctx.bot),
+        )
+        if ctx.bot.debug:
+            log_command_error(ctx, error)
     elif isinstance(original, DiscordOAuthError):
         await ctx.reply(
             "You must authorize us with Discord to use this command!\n"
@@ -122,6 +133,16 @@ async def on_app_command_error(
     elif isinstance(error, CommandResponse):
         if message := str(error):
             await send(message)
+    elif isinstance(original, ExpiredDiscordOAuthError):
+        await send(
+            "We've been deauthorized from Discord and require you to re-authorize us.\n"
+            "\n"
+            "Please click the button below to grant us authorization, then try again.",
+            ephemeral=True,
+            view=DiscordAuthorizeView(interaction.client),
+        )
+        if interaction.client.debug:
+            log_app_command_error(interaction, error)
     elif isinstance(original, DiscordOAuthError):
         await send(
             "You must authorize us with Discord to use this command!\n"

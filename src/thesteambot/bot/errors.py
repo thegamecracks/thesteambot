@@ -32,6 +32,13 @@ class MissingDiscordOAuthError(DiscordOAuthError):
         super().__init__(user_id, "No authorization found for user")
 
 
+class ExpiredDiscordOAuthError(DiscordOAuthError):
+    """Raised when the user's authentication has expired."""
+
+    def __init__(self, user_id: int) -> None:
+        super().__init__(user_id, "Authorization expired for user")
+
+
 class MissingSteamUserError(Exception):
     """Raised when the bot cannot retrieve any Steam accounts for the given user."""
 
