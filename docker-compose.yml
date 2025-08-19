@@ -10,7 +10,7 @@ services:
         condition: service_completed_successfully
     develop:
       watch:
-        - path: packages/bot/
+        - path: src/thesteambot/bot/
           action: rebuild
     env_file:
       - .env
@@ -61,13 +61,13 @@ services:
         condition: service_completed_successfully
     develop:
       watch:
-        - path: packages/web/src/thesteambot/web/static/
-          target: /packages/web/src/thesteambot/web/static/
+        - path: src/thesteambot/web/static/
+          target: /src/thesteambot/web/static/
           action: sync
-        - path: packages/web/src/thesteambot/web/templates/
-          target: /packages/web/src/thesteambot/web/templates/
+        - path: src/thesteambot/web/templates/
+          target: /src/thesteambot/web/templates/
           action: sync
-        - path: packages/web/
+        - path: src/thesteambot/web/
           ignore:
             - '**/static/'
             - '**/templates/'
