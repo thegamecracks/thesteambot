@@ -7,7 +7,7 @@ import discord
 import hikari
 
 from thesteambot.bot.bot import Bot
-from thesteambot.db.connection import create_pool
+from thesteambot.db import create_pool
 
 DEFAULT_EXTENSIONS = (
     "thesteambot.bot.cogs.cleanup",

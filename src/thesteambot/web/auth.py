@@ -4,7 +4,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 from starlette.routing import Route
 
-from thesteambot.db.client import DatabaseClient
+from thesteambot.db import DatabaseClient
 from thesteambot.web.lifespan import cast_state
 from thesteambot.web.oauth import oauth
 from thesteambot.web.templating import templates

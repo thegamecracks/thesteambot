@@ -8,8 +8,8 @@ from typing import AsyncIterator, Callable
 import hikari
 from hikari.impl import RESTClientImpl
 
-from thesteambot.db.client import DatabaseClient
-from thesteambot.oauth.errors import (
+from thesteambot.db import DatabaseClient
+from thesteambot.oauth import (
     DiscordOAuthError,
     ExpiredDiscordOAuthError,
     MissingDiscordOAuthError,

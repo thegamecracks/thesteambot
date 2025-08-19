@@ -7,7 +7,7 @@ from discord.ext import commands
 from thesteambot.bot.bot import Bot
 from thesteambot.bot.errors import MissingSteamUserError
 from thesteambot.bot.views import CancellableView, DiscordAuthorizeView
-from thesteambot.db.client import DatabaseClient
+from thesteambot.db import DatabaseClient
 from thesteambot.oauth import DiscordOAuthError
 
 
