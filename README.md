@@ -7,7 +7,9 @@ An experimental Discord application for fetching Steam connections from users.
 This is mostly a learning exercise for myself as I try to combine a webserver,
 OAuth2, and a Discord bot in the same project, so please don't use this in production!
 
-## Requirements
+## Setup
+
+Before running this application, you must have the following prepared:
 
 - Your own Discord application from https://discord.com/developers/applications
 
@@ -26,9 +28,7 @@ OAuth2, and a Discord bot in the same project, so please don't use this in produ
 [ngrok]: https://ngrok.com/
 [etc/nginx/sites-available/thesteambot]: /etc/nginx/sites-available/thesteambot
 
-## Setup
-
-Before running this application, you must follow these steps to set it up:
+Once those are ready, you can configure the project:
 
 1. Copy and rename each of the `env.example` files to remove the `.example` suffix
    and add a `.` prefix, for example, `env.bot.example` becomes `.env.bot`.
