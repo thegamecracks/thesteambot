@@ -30,6 +30,7 @@ class Bot(commands.Bot):
             command_prefix=commands.when_mentioned,
             help_command=None,
             intents=intents,
+            strip_after_prefix=True,
         )
 
         self.pool = pool
