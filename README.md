@@ -78,3 +78,9 @@ docker compose up --build --remove-orphans --watch
 ```
 
 Once running, the HTTP webserver can be accessed at port 2500.
+
+## License
+
+This project is written under the [MIT License].
+
+[MIT License]: /LICENSE
