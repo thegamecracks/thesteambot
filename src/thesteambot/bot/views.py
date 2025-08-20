@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from thesteambot.bot.bot import Bot
 
 
-class View(discord.ui.View):
+class View(discord.ui.LayoutView):
     async def on_error(
         self,
         interaction: discord.Interaction,
@@ -30,7 +30,7 @@ class View(discord.ui.View):
             await interaction.response.send_message(message, ephemeral=True)
 
 
-class CancellableView(discord.ui.View):
+class CancellableView(discord.ui.LayoutView):
     last_interaction: discord.Interaction | None = None
 
     def set_last_interaction(self, interaction: discord.Interaction) -> None:

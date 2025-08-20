@@ -1,3 +1,4 @@
+import datetime
 from typing import NamedTuple
 
 import discord
@@ -36,140 +37,179 @@ class ManageSteamUserView(CancellableView):
         self.user_id = user_id
         self.steam_ids = steam_ids
         self.connections = connections
-        self.on_select.options = [
-            discord.SelectOption(
-                label=c.name if (c := connections.get(steam_id)) else str(steam_id),
-                value=str(steam_id),
-            )
-            for steam_id in steam_ids
-        ]
+        self.reset_container()
+
+    def reset_container(self) -> discord.ui.Container:
+        self.clear_items()
+        select = ManageSteamUserSelect(self.steam_ids, self.connections)
+        container = discord.ui.Container(
+            discord.ui.TextDisplay("Available Steam accounts:"),
+            discord.ui.ActionRow(select),
+            discord.ui.Separator(spacing=discord.SeparatorSpacing.large),
+        )
+        self.add_item(container)
+        return container
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         return interaction.user.id == self.user_id
 
-    @discord.ui.select(options=[])
-    async def on_select(
-        self,
-        interaction: discord.Interaction,
-        select: discord.ui.Select,
-    ) -> None:
-        self.set_last_interaction(interaction)
 
-        async with self.bot.acquire_db_client() as db_client:
+class ManageSteamUserSelect(discord.ui.Select[ManageSteamUserView]):
+    def __init__(
+        self,
+        steam_ids: set[int],
+        connections: dict[int, SteamConnection],
+    ) -> None:
+        super().__init__(
+            options=[
+                discord.SelectOption(
+                    label=c.name if (c := connections.get(steam_id)) else str(steam_id),
+                    value=str(steam_id),
+                )
+                for steam_id in steam_ids
+            ],
+            placeholder="Select a Steam account",
+        )
+
+    async def callback(self, interaction: discord.Interaction) -> None:
+        assert self.view is not None
+        self.view.set_last_interaction(interaction)
+
+        async with self.view.bot.acquire_db_client() as db_client:
             rows = await db_client.get_discord_user_steam(interaction.user.id)
             current = {row["steam_id"]: row for row in rows}
 
-        selected = int(select.values[0])
-        connection = self.connections.get(selected)
+        selected = int(self.values[0])
+        connection = self.view.connections.get(selected)
         if connection is not None:
             name = f"{connection.name} (ID {connection.id})"
         else:
             name = f"{selected}"
 
-        if selected not in current:
-            view = AddSteamUserView(self.bot, interaction.user.id, selected, name)
-            view.set_last_interaction(interaction)
-            await interaction.response.send_message(
+        row = current.get(selected)
+        if row is not None:
+            created_at = row["created_at"]
+        else:
+            created_at = None
+
+        self.show_user_actions(interaction.user.id, selected, name, created_at)
+        await interaction.response.edit_message(view=self.view)
+
+    def show_user_actions(
+        self,
+        user_id: int,
+        selected: int,
+        name: str,
+        created_at: datetime.datetime | None,
+    ) -> None:
+        assert self.view is not None
+        container = self.view.reset_container()
+
+        if created_at is None:
+            display = discord.ui.TextDisplay(
                 f"{name} has not yet been connected with us.\n"
                 "Would you like to connect this Steam account? "
                 "You can undo this afterwards by selecting the account again.\n"
                 "\n"
                 "Connecting will allow us to show your Steam account to other users, "
-                "even if you have otherwise hidden the account on your profile.",
-                ephemeral=True,
-                view=view,
+                "even if you have otherwise hidden the account on your profile."
             )
+            is_connecting = True
         else:
-            view = DeleteSteamUserView(self.bot, interaction.user.id, selected, name)
-            view.set_last_interaction(interaction)
-            created_at = discord.utils.format_dt(current[selected]["created_at"])
-            await interaction.response.send_message(
-                f"{name} has already been connected with us on {created_at}.\n"
+            created_at_str = discord.utils.format_dt(created_at)
+            display = discord.ui.TextDisplay(
+                f"{name} has already been connected with us on {created_at_str}.\n"
                 "Would you like to disconnect this Steam account? "
                 "Beware that any data we have stored with this account will be "
                 "deleted, including the list of servers you've connected this "
-                "account to.",
-                ephemeral=True,
-                view=view,
+                "account to."
             )
+            is_connecting = False
+
+        container.add_item(display)
+        container.add_item(
+            SteamUserActionRow(
+                self.view.bot,
+                user_id,
+                selected,
+                name,
+                display,
+                is_connecting,
+            )
+        )
 
 
-class AddSteamUserView(CancellableView):
-    def __init__(self, bot: Bot, user_id: int, steam_id: int, steam_name: str):
+class SteamUserActionRow(discord.ui.ActionRow[ManageSteamUserView]):
+    def __init__(
+        self,
+        bot: Bot,
+        user_id: int,
+        steam_id: int,
+        steam_name: str,
+        display: discord.ui.TextDisplay,
+        is_connecting: bool,
+    ):
         super().__init__()
         self.bot = bot
         self.user_id = user_id
         self.steam_id = steam_id
         self.steam_name = steam_name
+        self.display = display
+        self.is_connecting = is_connecting
+
+        if is_connecting:
+            self.on_toggle.label = "Connect"
+            self.on_toggle.style = discord.ButtonStyle.primary
+        else:
+            self.on_toggle.label = "Delete"
+            self.on_toggle.style = discord.ButtonStyle.danger
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         return interaction.user.id == self.user_id
 
-    @discord.ui.button(label="Connect", style=discord.ButtonStyle.primary)
-    async def on_delete(
+    @discord.ui.button()
+    async def on_toggle(
         self,
         interaction: discord.Interaction,
         button: discord.ui.Button,
     ) -> None:
+        assert self.view is not None
+        self.view.set_last_interaction(interaction)
+
+        if self.is_connecting:
+            await self.add_steam_user(interaction.user.id)
+            self.display.content = (
+                f"Successfully connected the Steam account, {self.steam_name}!"
+            )
+        else:
+            await self.delete_steam_user()
+            self.display.content = (
+                f"Successfully disconnected the Steam account, {self.steam_name}!"
+            )
+
+        button.disabled = True
+        await interaction.response.edit_message(view=self.view)
+        # TODO: allow re-selecting same account
+
+    @discord.ui.button(label="Back", style=discord.ButtonStyle.secondary)
+    async def on_back(
+        self,
+        interaction: discord.Interaction,
+        button: discord.ui.Button,
+    ) -> None:
+        assert self.view is not None
+        self.view.set_last_interaction(interaction)
+        self.view.reset_container()
+        await interaction.response.edit_message(view=self.view)
+
+    async def add_steam_user(self, user_id: int) -> None:
         async with self.bot.acquire_db_client() as db_client:
             await db_client.add_steam_user(self.steam_id)
-            await db_client.add_discord_user_steam(
-                interaction.user.id,
-                steam_id=self.steam_id,
-            )
+            await db_client.add_discord_user_steam(user_id, steam_id=self.steam_id)
 
-        await interaction.response.edit_message(
-            content=f"Successfully connected the Steam account, {self.steam_name}!",
-            view=None,
-        )
-        self.stop()
-
-    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.secondary)
-    async def on_cancel(
-        self,
-        interaction: discord.Interaction,
-        button: discord.ui.Button,
-    ) -> None:
-        self.set_last_interaction(interaction)
-        await interaction.response.defer()
-        await self.delete()
-
-
-class DeleteSteamUserView(CancellableView):
-    def __init__(self, bot: Bot, user_id: int, steam_id: int, steam_name: str):
-        super().__init__()
-        self.bot = bot
-        self.user_id = user_id
-        self.steam_id = steam_id
-        self.steam_name = steam_name
-
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        return interaction.user.id == self.user_id
-
-    @discord.ui.button(label="Delete", style=discord.ButtonStyle.danger)
-    async def on_delete(
-        self,
-        interaction: discord.Interaction,
-        button: discord.ui.Button,
-    ) -> None:
+    async def delete_steam_user(self) -> None:
         async with self.bot.acquire_db_client() as db_client:
             await db_client.delete_steam_user(self.steam_id)
-
-        await interaction.response.edit_message(
-            content=f"Successfully disconnected the Steam account, {self.steam_name}!",
-            view=None,
-        )
-        self.stop()
-
-    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.secondary)
-    async def on_cancel(
-        self,
-        interaction: discord.Interaction,
-        button: discord.ui.Button,
-    ) -> None:
-        self.set_last_interaction(interaction)
-        await interaction.response.defer()
-        await self.delete()
 
 
 class OAuth(
@@ -244,11 +284,7 @@ class OAuth(
             connections,
         )
         view.set_last_interaction(interaction)
-        await interaction.response.send_message(
-            "Available Steam accounts:",
-            ephemeral=True,
-            view=view,
-        )
+        await interaction.response.send_message(ephemeral=True, view=view)
 
 
 async def setup(bot: Bot) -> None:
