@@ -7,6 +7,24 @@ An experimental Discord application for fetching Steam connections from users.
 This is mostly a learning exercise for myself as I try to combine a webserver,
 OAuth2, and a Discord bot in the same project, so please don't use this in production!
 
+## Libraries
+
+This project is written in Python 3.11+ and relies most importantly
+on the following dependencies:
+- [asyncpg]: An asynchronous database connector for PostgreSQL.
+- [Authlib]: The primary OAuth web client used in our web flow.
+- [discord.py]: The primary Discord API wrapper used in our Discord bot.
+- [Hikari]: Our secondary Discord API wrapper used for OAuth-specific endpoints.
+- [Starlette]: The ASGI framework used in writing our web application.
+- [Uvicorn]: The ASGI webserver that hosts our Starlette application.
+
+[asyncpg]: https://github.com/MagicStack/asyncpg
+[Authlib]: https://github.com/authlib/authlib
+[discord.py]: https://github.com/Rapptz/discord.py
+[Hikari]: https://github.com/hikari-py/hikari
+[Starlette]: https://github.com/encode/starlette
+[Uvicorn]: https://github.com/encode/uvicorn
+
 ## Setup
 
 Before running this application, you must have the following prepared:
