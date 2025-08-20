@@ -11,6 +11,8 @@ OAuth2, and a Discord bot in the same project, so please don't use this in produ
 
 Before running this application, you must have the following prepared:
 
+- [Docker Engine] installed on your system
+
 - Your own Discord application from https://discord.com/developers/applications
 
   For the Discord bot to work, you must also have the Members privileged intent
@@ -23,6 +25,7 @@ Before running this application, you must have the following prepared:
 
   An example Nginx configuration can be found in [etc/nginx/sites-available/thesteambot].
 
+[Docker Engine]: https://docs.docker.com/get-started/get-docker/
 [Apache]: https://httpd.apache.org/
 [Nginx]: https://nginx.org/
 [ngrok]: https://ngrok.com/
