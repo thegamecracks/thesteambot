@@ -181,11 +181,13 @@ class SteamUserActionRow(discord.ui.ActionRow[ManageSteamUserView]):
             self.display.content = (
                 f"Successfully connected the Steam account, {self.steam_name}!"
             )
+            button.label = "Connected"
         else:
             await self.delete_steam_user()
             self.display.content = (
                 f"Successfully disconnected the Steam account, {self.steam_name}!"
             )
+            button.label = "Deleted"
 
         button.disabled = True
         await interaction.response.edit_message(view=self.view)
