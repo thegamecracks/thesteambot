@@ -9,8 +9,11 @@ OAuth2, and a Discord bot in the same project, so please don't use this in produ
 
 ## Requirements
 
-- Discord application in https://discord.com/developers/applications
-- Members privileged intent associated with your application's bot
+- Your own Discord application from https://discord.com/developers/applications
+
+  For the Discord bot to work, you must also have the Members privileged intent
+  enabled in your Bot page.
+
 - A reverse proxy, like [Apache] or [Nginx], configured with your domain and TLS encryption
 
   Anything able to forward port 2500 => 443 and encrypt your traffic will work.
