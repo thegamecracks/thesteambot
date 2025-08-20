@@ -1,10 +1,10 @@
 # HTTPS redirect
 server {
-    server_name steam.thegamecracks.xyz;
+    server_name example.com;
     listen 80;
     listen [::]:80;
 
-    if ($host = steam.thegamecracks.xyz) {
+    if ($host = example.com) {
         return 301 https://$host$request_uri;
     }
 
@@ -13,7 +13,7 @@ server {
 
 # HTTPS reverse proxy to HTTP webserver
 server {
-    server_name steam.thegamecracks.xyz;
+    server_name example.com;
     listen 443 ssl;
     listen [::]:443 ssl;
 
