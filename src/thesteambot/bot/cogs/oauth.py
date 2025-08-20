@@ -229,8 +229,8 @@ class OAuth(
     @app_commands.checks.cooldown(1, 10, key=lambda interaction: interaction.user.id)
     async def discord_command(self, interaction: discord.Interaction) -> None:
         try:
-            async with self.bot.acquire_rest_client(interaction.user):
-                pass
+            async with self.bot.acquire_rest_client(interaction.user) as client:
+                await client.fetch_my_user()
         except DiscordOAuthError:
             connected = False
         else:
