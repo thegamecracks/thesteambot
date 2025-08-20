@@ -43,7 +43,7 @@ class ManageSteamUserView(CancellableView):
         self.clear_items()
         select = ManageSteamUserSelect(self.steam_ids, self.connections)
         container = discord.ui.Container(
-            discord.ui.TextDisplay("Available Steam accounts:"),
+            discord.ui.TextDisplay("# Add or Remove Steam Accounts"),
             discord.ui.ActionRow(select),
             discord.ui.Separator(spacing=discord.SeparatorSpacing.large),
         )
