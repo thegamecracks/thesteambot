@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import os
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
@@ -36,11 +37,13 @@ async def async_main() -> None:
     token = os.environ["BOT_TOKEN"]
 
     discord.utils.setup_logging(root=True)
+    if debug:
+        assert __package__ is not None
+        logging.getLogger(__package__.partition(".")[0]).setLevel(logging.DEBUG)
 
     async with create_pool() as pool, start_rest_app() as rest:
         bot = Bot(
             base_url=base_url,
-            debug=debug,
             extensions=extensions,
             pool=pool,
             rest=rest,

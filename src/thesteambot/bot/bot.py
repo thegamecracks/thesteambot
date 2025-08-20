@@ -19,7 +19,6 @@ class Bot(commands.Bot):
         self,
         *,
         base_url: str,
-        debug: bool,
         extensions: Sequence[str],
         pool: asyncpg.Pool,
         rest: hikari.RESTApp,
@@ -33,7 +32,6 @@ class Bot(commands.Bot):
             intents=intents,
         )
 
-        self.debug = debug
         self.pool = pool
         self.rest = rest
         self._base_url = base_url

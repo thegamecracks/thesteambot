@@ -27,8 +27,7 @@ async def on_command_error(ctx: Context, error: commands.CommandError) -> None:
     # User input
     elif isinstance(error, commands.ConversionError):
         await ctx.reply("I could not parse your input.")
-        if ctx.bot.debug:
-            log_command_error(ctx, error)
+        log_command_error(ctx, error, debug=True)
     elif isinstance(error, commands.UserInputError):
         await ctx.reply(f"Could not parse your input: {error}")
     # Checks
@@ -46,8 +45,7 @@ async def on_command_error(ctx: Context, error: commands.CommandError) -> None:
         await ctx.reply(f"This command is on cooldown for {error.retry_after:.1f}s.")
     elif isinstance(error, commands.CheckFailure):
         await ctx.reply("A check failed to pass before running this command.")
-        if ctx.bot.debug:
-            log_command_error(ctx, error)
+        log_command_error(ctx, error, debug=True)
     # Runtime errors
     elif isinstance(error, CommandResponse):
         if message := str(error):
@@ -55,13 +53,11 @@ async def on_command_error(ctx: Context, error: commands.CommandError) -> None:
     elif isinstance(original, ExpiredDiscordOAuthError):
         view = create_view_discord_deauthorized(ctx.bot)
         await ctx.reply(ephemeral=True, view=view)
-        if ctx.bot.debug:
-            log_command_error(ctx, error)
+        log_command_error(ctx, error, debug=True)
     elif isinstance(original, DiscordOAuthError):
         view = create_view_discord_not_authorized(ctx.bot)
         await ctx.reply(delete_after=60, view=view)
-        if ctx.bot.debug:
-            log_command_error(ctx, error)
+        log_command_error(ctx, error, debug=True)
     elif isinstance(original, MissingSteamUserError):
         await ctx.reply(
             "You must have a Steam account connected with Discord to use this command!\n"
@@ -70,15 +66,23 @@ async def on_command_error(ctx: Context, error: commands.CommandError) -> None:
             "Steam account, then try again.",
             delete_after=60,
         )
-        if ctx.bot.debug:
-            log_command_error(ctx, error)
+        log_command_error(ctx, error, debug=True)
     else:
         await ctx.reply("An unknown error occurred while running this command.")
         log_command_error(ctx, error)
 
 
-def log_command_error(ctx: Context, error: commands.CommandError) -> None:
-    log.exception(f"Exception occurred in command {ctx.command!r}", exc_info=error)
+def log_command_error(
+    ctx: Context,
+    error: commands.CommandError,
+    *,
+    debug: bool = False,
+) -> None:
+    log.log(
+        logging.DEBUG if debug else logging.ERROR,
+        f"Exception occurred in command {ctx.command!r}",
+        exc_info=error,
+    )
 
 
 async def on_app_command_error(
@@ -101,8 +105,7 @@ async def on_app_command_error(
     # User input
     elif isinstance(error, app_commands.TransformerError):
         await send("I could not parse your input.")
-        if interaction.client.debug:
-            log_app_command_error(interaction, error)
+        log_app_command_error(interaction, error, debug=True)
     # Checks
     elif isinstance(error, app_commands.NoPrivateMessage):
         await send("This command must be used in a server.")
@@ -116,8 +119,7 @@ async def on_app_command_error(
         await send(f"This command is on cooldown for {error.retry_after:.1f}s.")
     elif isinstance(error, app_commands.CheckFailure):
         await send("A check failed to pass before running this command.")
-        if interaction.client.debug:
-            log_app_command_error(interaction, error)
+        log_app_command_error(interaction, error, debug=True)
     # Runtime errors
     elif isinstance(error, CommandResponse):
         if message := str(error):
@@ -125,13 +127,11 @@ async def on_app_command_error(
     elif isinstance(original, ExpiredDiscordOAuthError):
         view = create_view_discord_deauthorized(interaction.client)
         await send(ephemeral=True, view=view)
-        if interaction.client.debug:
-            log_app_command_error(interaction, error)
+        log_app_command_error(interaction, error, debug=True)
     elif isinstance(original, DiscordOAuthError):
         view = create_view_discord_not_authorized(interaction.client)
         await send(ephemeral=True, view=view)
-        if interaction.client.debug:
-            log_app_command_error(interaction, error)
+        log_app_command_error(interaction, error, debug=True)
     elif isinstance(original, MissingSteamUserError):
         await send(
             "You must have a Steam account connected with Discord to use this command!\n"
@@ -140,8 +140,7 @@ async def on_app_command_error(
             "Steam account, then try again.",
             ephemeral=True,
         )
-        if interaction.client.debug:
-            log_app_command_error(interaction, error)
+        log_app_command_error(interaction, error, debug=True)
     else:
         await send("An unknown error occurred while running this command.")
         log_app_command_error(interaction, error)
@@ -150,9 +149,12 @@ async def on_app_command_error(
 def log_app_command_error(
     interaction: discord.Interaction,
     error: app_commands.AppCommandError,
+    *,
+    debug: bool = False,
 ) -> None:
     command = interaction.command.qualified_name if interaction.command else None
-    log.exception(
+    log.log(
+        logging.DEBUG if debug else logging.ERROR,
         f"Exception occurred in application command {command!r}",
         exc_info=error,
     )
