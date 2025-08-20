@@ -1,5 +1,7 @@
 # thesteambot
 
+![](https://github.com/user-attachments/assets/46f1cf45-d5ec-4047-9d60-8089534507ee)
+
 An experimental Discord application for fetching Steam connections from users.
 
 This is mostly a learning exercise for myself as I try to combine a webserver,
