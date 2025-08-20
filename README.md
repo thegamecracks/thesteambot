@@ -19,9 +19,12 @@ OAuth2, and a Discord bot in the same project, so please don't use this in produ
   Anything able to forward port 2500 => 443 and encrypt your traffic will work.
   [ngrok]'s free tier is a suitable option for local testing.
 
+  An example Nginx configuration can be found in [etc/nginx/sites-available/thesteambot].
+
 [Apache]: https://httpd.apache.org/
 [Nginx]: https://nginx.org/
 [ngrok]: https://ngrok.com/
+[etc/nginx/sites-available/thesteambot]: /etc/nginx/sites-available/thesteambot
 
 ## Setup
 
