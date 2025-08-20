@@ -11,7 +11,14 @@ OAuth2, and a Discord bot in the same project, so please don't use this in produ
 
 - Discord application in https://discord.com/developers/applications
 - Members privileged intent associated with your application's bot
-- A reverse proxy, like Apache or Nginx, configured with your domain and TLS encryption
+- A reverse proxy, like [Apache] or [Nginx], configured with your domain and TLS encryption
+
+  Anything able to forward port 2500 => 443 and encrypt your traffic will work.
+  [ngrok]'s free tier is a suitable option for local testing.
+
+[Apache]: https://httpd.apache.org/
+[Nginx]: https://nginx.org/
+[ngrok]: https://ngrok.com/
 
 ## Setup
 
