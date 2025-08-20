@@ -6,7 +6,7 @@ from discord.ext import commands
 
 from thesteambot.bot.bot import Bot
 from thesteambot.bot.errors import MissingSteamUserError
-from thesteambot.bot.views import CancellableView, DiscordAuthorizeView
+from thesteambot.bot.views import CancellableView, create_authorize_view
 from thesteambot.db import DatabaseClient
 from thesteambot.oauth import DiscordOAuthError
 
@@ -202,14 +202,14 @@ class OAuth(
                 ephemeral=True,
             )
         else:
-            await interaction.response.send_message(
+            view = create_authorize_view(
+                self.bot,
                 "Click the button below to connect your Discord account using OAuth.\n"
                 "\n"
                 "This command is usually unnecessary, as we will automatically prompt you "
                 "to connect your account before performing any action that requires it.",
-                ephemeral=True,
-                view=DiscordAuthorizeView(self.bot),
             )
+            await interaction.response.send_message(ephemeral=True, view=view)
 
     @app_commands.command(
         name="steam",

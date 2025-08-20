@@ -10,8 +10,8 @@ from thesteambot.bot.errors import (
     CommandResponse,
     MissingSteamUserError,
 )
+from thesteambot.bot.views import create_authorize_view
 from thesteambot.oauth import DiscordOAuthError, ExpiredDiscordOAuthError
-from thesteambot.bot.views import DiscordAuthorizeView
 
 log = logging.getLogger(__name__)
 
@@ -53,23 +53,13 @@ async def on_command_error(ctx: Context, error: commands.CommandError) -> None:
         if message := str(error):
             await ctx.reply(message)
     elif isinstance(original, ExpiredDiscordOAuthError):
-        await ctx.reply(
-            "We've been deauthorized from Discord and require you to re-authorize us.\n"
-            "\n"
-            "Please click the button below to grant us authorization, then try again.",
-            ephemeral=True,
-            view=DiscordAuthorizeView(ctx.bot),
-        )
+        view = create_view_discord_deauthorized(ctx.bot)
+        await ctx.reply(ephemeral=True, view=view)
         if ctx.bot.debug:
             log_command_error(ctx, error)
     elif isinstance(original, DiscordOAuthError):
-        await ctx.reply(
-            "You must authorize us with Discord to use this command!\n"
-            "\n"
-            "Please click the button below to grant us authorization, then try again.",
-            delete_after=60,
-            view=DiscordAuthorizeView(ctx.bot),
-        )
+        view = create_view_discord_not_authorized(ctx.bot)
+        await ctx.reply(delete_after=60, view=view)
         if ctx.bot.debug:
             log_command_error(ctx, error)
     elif isinstance(original, MissingSteamUserError):
@@ -133,23 +123,13 @@ async def on_app_command_error(
         if message := str(error):
             await send(message)
     elif isinstance(original, ExpiredDiscordOAuthError):
-        await send(
-            "We've been deauthorized from Discord and require you to re-authorize us.\n"
-            "\n"
-            "Please click the button below to grant us authorization, then try again.",
-            ephemeral=True,
-            view=DiscordAuthorizeView(interaction.client),
-        )
+        view = create_view_discord_deauthorized(interaction.client)
+        await send(ephemeral=True, view=view)
         if interaction.client.debug:
             log_app_command_error(interaction, error)
     elif isinstance(original, DiscordOAuthError):
-        await send(
-            "You must authorize us with Discord to use this command!\n"
-            "\n"
-            "Please click the button below to grant us authorization, then try again.",
-            ephemeral=True,
-            view=DiscordAuthorizeView(interaction.client),
-        )
+        view = create_view_discord_not_authorized(interaction.client)
+        await send(ephemeral=True, view=view)
         if interaction.client.debug:
             log_app_command_error(interaction, error)
     elif isinstance(original, MissingSteamUserError):
@@ -184,6 +164,24 @@ async def interaction_send(interaction: discord.Interaction, *args, **kwargs) ->
     else:
         kwargs.setdefault("ephemeral", True)
         await interaction.response.send_message(*args, **kwargs)
+
+
+def create_view_discord_not_authorized(bot: Bot) -> discord.ui.LayoutView:
+    return create_authorize_view(
+        bot,
+        "You must authorize us with Discord to use this command!\n"
+        "\n"
+        "Please click the button below to grant us authorization, then try again.",
+    )
+
+
+def create_view_discord_deauthorized(bot: Bot) -> discord.ui.LayoutView:
+    return create_authorize_view(
+        bot,
+        "We've been deauthorized from Discord and require you to re-authorize us.\n"
+        "\n"
+        "Please click the button below to grant us authorization, then try again.",
+    )
 
 
 class Errors(commands.Cog):
