@@ -4,8 +4,8 @@ from discord.ext import commands
 
 from thesteambot.bot.bot import Bot
 from thesteambot.bot.views import (
+    DiscordAuthorizeView,
     DiscordDeauthorizeView,
-    create_authorize_view,
     create_manage_steam_user_view,
 )
 from thesteambot.oauth import DiscordOAuthError
@@ -43,16 +43,17 @@ class OAuth(
                 "or remove us from the Authorized Apps page in your Discord settings.\n"
                 "Doing this will not remove any of your linked Steam accounts.",
             )
-            await interaction.response.send_message(ephemeral=True, view=view)
         else:
-            view = create_authorize_view(
+            view = DiscordAuthorizeView(
                 self.bot,
                 "Click the button below to connect your Discord account using OAuth.\n"
                 "\n"
                 "This command is usually unnecessary, as we will automatically prompt you "
                 "to connect your account before performing any action that requires it.",
             )
-            await interaction.response.send_message(ephemeral=True, view=view)
+
+        await interaction.response.send_message(ephemeral=True, view=view)
+        view.set_last_interaction(interaction)
 
     @app_commands.command(
         name="steam",

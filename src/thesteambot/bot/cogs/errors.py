@@ -10,7 +10,7 @@ from thesteambot.bot.errors import (
     CommandResponse,
     MissingSteamUserError,
 )
-from thesteambot.bot.views import create_authorize_view
+from thesteambot.bot.views import DiscordAuthorizeView
 from thesteambot.oauth import DiscordOAuthError, ExpiredDiscordOAuthError
 
 log = logging.getLogger(__name__)
@@ -167,9 +167,13 @@ async def interaction_send(interaction: discord.Interaction, *args, **kwargs) ->
         kwargs.setdefault("ephemeral", True)
         await interaction.response.send_message(*args, **kwargs)
 
+        set_last_interaction = getattr(kwargs.get("view"), "set_last_interaction", None)
+        if set_last_interaction is not None:
+            set_last_interaction(interaction)
+
 
 def create_view_discord_not_authorized(bot: Bot) -> discord.ui.LayoutView:
-    return create_authorize_view(
+    return DiscordAuthorizeView(
         bot,
         "You must authorize us with Discord to use this command!\n"
         "\n"
@@ -178,7 +182,7 @@ def create_view_discord_not_authorized(bot: Bot) -> discord.ui.LayoutView:
 
 
 def create_view_discord_deauthorized(bot: Bot) -> discord.ui.LayoutView:
-    return create_authorize_view(
+    return DiscordAuthorizeView(
         bot,
         "We've been deauthorized from Discord and require you to re-authorize us.\n"
         "\n"

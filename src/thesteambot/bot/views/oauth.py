@@ -15,6 +15,17 @@ if TYPE_CHECKING:
     from thesteambot.bot.bot import Bot
 
 
+class DiscordAuthorizeView(CancellableView):
+    def __init__(self, bot: Bot, content: str) -> None:
+        self.display = discord.ui.TextDisplay(content)
+        self.container = discord.ui.Container(
+            self.display,
+            discord.ui.Separator(),
+            DiscordAuthorizeActionRow(bot),
+        )
+        self.add_item(self.container)
+
+
 class DiscordAuthorizeActionRow(discord.ui.ActionRow):
     def __init__(self, bot: Bot):
         super().__init__()
@@ -24,17 +35,6 @@ class DiscordAuthorizeActionRow(discord.ui.ActionRow):
                 url=bot.url_for("/login/discord"),
             )
         )
-
-
-def create_authorize_view(bot: Bot, content: str) -> discord.ui.LayoutView:
-    container = discord.ui.Container(
-        discord.ui.TextDisplay(content),
-        discord.ui.Separator(),
-        DiscordAuthorizeActionRow(bot),
-    )
-    view = discord.ui.LayoutView()
-    view.add_item(container)
-    return view
 
 
 class DiscordDeauthorizeView(CancellableView):
