@@ -10,7 +10,10 @@ services:
         condition: service_completed_successfully
     develop:
       watch:
-        - path: src/thesteambot/bot/
+        - path: src/thesteambot/
+          ignore:
+            - '**/static/'
+            - '**/templates/'
           action: rebuild
     env_file:
       - .env
@@ -67,7 +70,7 @@ services:
         - path: src/thesteambot/web/templates/
           target: /src/thesteambot/web/templates/
           action: sync
-        - path: src/thesteambot/web/
+        - path: src/thesteambot/
           ignore:
             - '**/static/'
             - '**/templates/'
