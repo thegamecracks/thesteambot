@@ -9,7 +9,7 @@ from thesteambot.bot.bot import Bot
 from thesteambot.bot.errors import MissingSteamUserError
 from thesteambot.bot.views import CancellableView, create_authorize_view
 from thesteambot.db import DatabaseClient
-from thesteambot.oauth import DiscordOAuthError
+from thesteambot.oauth import DiscordOAuthError, revoke_access_token
 
 
 async def get_steam_ids(db_client: DatabaseClient, user_id: int):
@@ -213,6 +213,56 @@ class SteamUserActionRow(discord.ui.ActionRow[ManageSteamUserView]):
             await db_client.delete_steam_user(self.steam_id)
 
 
+class DiscordDeauthorizeView(CancellableView):
+    def __init__(self, bot: Bot, user_id: int, content: str) -> None:
+        super().__init__()
+        self.bot = bot
+        self.user_id = user_id
+
+        self.display = discord.ui.TextDisplay(content)
+        self.container = discord.ui.Container(
+            self.display,
+            discord.ui.Separator(),
+            DiscordDeauthorizeActionRow(),
+        )
+        self.add_item(self.container)
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        return interaction.user.id == self.user_id
+
+
+class DiscordDeauthorizeActionRow(discord.ui.ActionRow[DiscordDeauthorizeView]):
+    @discord.ui.button(label="Disconnect", style=discord.ButtonStyle.danger)
+    async def on_disconnect(
+        self,
+        interaction: discord.Interaction,
+        button: discord.ui.Button,
+    ) -> None:
+        assert self.view is not None
+
+        async with self.view.bot.acquire_db_client() as client:
+            await revoke_access_token(self.view.bot.rest, client, self.view.user_id)
+
+        self.view.display.content = (
+            "Successfully deauthorized us from your Discord account!"
+        )
+        self.on_disconnect.disabled = True
+        self.on_cancel.disabled = True
+
+        await interaction.response.edit_message(view=self.view)
+
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.secondary)
+    async def on_cancel(
+        self,
+        interaction: discord.Interaction,
+        button: discord.ui.Button,
+    ) -> None:
+        assert self.view is not None
+        await interaction.response.defer()
+        self.view.set_last_interaction(interaction)
+        await self.view.delete()
+
+
 class OAuth(
     commands.GroupCog,
     group_name="connect",
@@ -236,12 +286,16 @@ class OAuth(
             connected = True
 
         if connected:
-            await interaction.response.send_message(
+            view = DiscordDeauthorizeView(
+                self.bot,
+                interaction.user.id,
                 "Your Discord account is already connected!\n"
-                "To disconnect your account, you may remove us from the Authorized Apps "
-                "page in your Discord settings.",
-                ephemeral=True,
+                "\n"
+                "If you'd like to disconnect your account, you may click the button below, "
+                "or remove us from the Authorized Apps page in your Discord settings.\n"
+                "Doing this will not remove any of your linked Steam accounts.",
             )
+            await interaction.response.send_message(ephemeral=True, view=view)
         else:
             view = create_authorize_view(
                 self.bot,

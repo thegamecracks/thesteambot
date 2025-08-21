@@ -110,6 +110,35 @@ async def refresh_access_token(
     return token.access_token, str(token.token_type)
 
 
+async def revoke_access_token(
+    rest: hikari.RESTApp,
+    db_client: DatabaseClient,
+    user_id: int,
+) -> None:
+    row = await db_client.get_discord_oauth(user_id)
+    if row is None:
+        raise MissingDiscordOAuthError(user_id)
+
+    client_id = int(os.environ["DISCORD_CLIENT_ID"])
+    client_secret = os.environ["DISCORD_CLIENT_SECRET"]
+
+    access_token = row["access_token"]
+    token_type = row["token_type"]
+    async with rest.acquire(access_token, token_type) as client:
+        try:
+            await client.revoke_access_token(
+                client_id,
+                client_secret,
+                access_token,
+            )
+        except hikari.ClientHTTPResponseError as e:
+            await db_client.delete_discord_oauth(user_id)
+            message = "Failed to revoke access token for user"
+            raise DiscordOAuthError(user_id, message) from e
+        else:
+            await db_client.delete_discord_oauth(user_id)
+
+
 @asynccontextmanager
 async def wrap_rest_client(
     acquire_db_client: Callable[[], AbstractAsyncContextManager[DatabaseClient]],
