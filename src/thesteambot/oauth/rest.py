@@ -84,7 +84,7 @@ async def refresh_access_token(
                 client_secret,
                 refresh_token,
             )
-        except hikari.HTTPError as e:
+        except hikari.ClientHTTPResponseError as e:
             await db_client.delete_discord_oauth(user_id)
             message = "Failed to refresh access token for user"
             raise DiscordOAuthError(user_id, message) from e
