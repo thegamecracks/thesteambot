@@ -74,6 +74,7 @@ class DiscordDeauthorizeActionRow(discord.ui.ActionRow[DiscordDeauthorizeView]):
         self.on_cancel.disabled = True
 
         await interaction.response.edit_message(view=self.view)
+        self.view.set_last_interaction(interaction)
 
     @discord.ui.button(label="Cancel", style=discord.ButtonStyle.secondary)
     async def on_cancel(
