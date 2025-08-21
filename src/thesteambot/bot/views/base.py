@@ -1,13 +1,6 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
 import discord
 
 from thesteambot.bot.errors import AppCommandResponse
-
-if TYPE_CHECKING:
-    from thesteambot.bot.bot import Bot
 
 
 class View(discord.ui.LayoutView):
@@ -52,25 +45,3 @@ class CancellableView(discord.ui.LayoutView):
         interaction = self.last_interaction
         if interaction is not None and not interaction.is_expired():
             await interaction.delete_original_response()
-
-
-class DiscordAuthorizeActionRow(discord.ui.ActionRow):
-    def __init__(self, bot: Bot):
-        super().__init__()
-        self.add_item(
-            discord.ui.Button(
-                label="Authorize",
-                url=bot.url_for("/login/discord"),
-            )
-        )
-
-
-def create_authorize_view(bot: Bot, content: str) -> discord.ui.LayoutView:
-    container = discord.ui.Container(
-        discord.ui.TextDisplay(content),
-        discord.ui.Separator(),
-        DiscordAuthorizeActionRow(bot),
-    )
-    view = discord.ui.LayoutView()
-    view.add_item(container)
-    return view
