@@ -73,7 +73,6 @@ class ManageSteamUserSelect(discord.ui.Select[ManageSteamUserView]):
 
     async def callback(self, interaction: discord.Interaction) -> None:
         assert self.view is not None
-        self.view.set_last_interaction(interaction)
 
         async with self.view.bot.acquire_db_client() as db_client:
             rows = await db_client.get_discord_user_steam(interaction.user.id)
@@ -94,6 +93,7 @@ class ManageSteamUserSelect(discord.ui.Select[ManageSteamUserView]):
 
         self.show_user_actions(interaction.user.id, selected, name, created_at)
         await interaction.response.edit_message(view=self.view)
+        self.view.set_last_interaction(interaction)
 
     def show_user_actions(
         self,
@@ -174,7 +174,6 @@ class SteamUserActionRow(discord.ui.ActionRow[ManageSteamUserView]):
         button: discord.ui.Button,
     ) -> None:
         assert self.view is not None
-        self.view.set_last_interaction(interaction)
 
         if self.is_connecting:
             await self.add_steam_user(interaction.user.id)
@@ -191,6 +190,7 @@ class SteamUserActionRow(discord.ui.ActionRow[ManageSteamUserView]):
 
         button.disabled = True
         await interaction.response.edit_message(view=self.view)
+        self.view.set_last_interaction(interaction)
 
     @discord.ui.button(label="Back", style=discord.ButtonStyle.secondary)
     async def on_back(
@@ -199,9 +199,9 @@ class SteamUserActionRow(discord.ui.ActionRow[ManageSteamUserView]):
         button: discord.ui.Button,
     ) -> None:
         assert self.view is not None
-        self.view.set_last_interaction(interaction)
         self.view.reset_container()
         await interaction.response.edit_message(view=self.view)
+        self.view.set_last_interaction(interaction)
 
     async def add_steam_user(self, user_id: int) -> None:
         async with self.bot.acquire_db_client() as db_client:
@@ -284,8 +284,8 @@ class OAuth(
             current_steam_ids | set(connections),
             connections,
         )
-        view.set_last_interaction(interaction)
         await interaction.response.send_message(ephemeral=True, view=view)
+        view.set_last_interaction(interaction)
 
 
 async def setup(bot: Bot) -> None:

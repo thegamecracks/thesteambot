@@ -34,6 +34,12 @@ class CancellableView(discord.ui.LayoutView):
     last_interaction: discord.Interaction | None = None
 
     def set_last_interaction(self, interaction: discord.Interaction) -> None:
+        if not interaction.response.is_done():
+            raise RuntimeError(
+                "Cannot set last interaction without responding "
+                "to the interaction first"
+            )
+
         self.last_interaction = interaction
 
     async def delete(self) -> None:
