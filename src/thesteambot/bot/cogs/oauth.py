@@ -191,7 +191,6 @@ class SteamUserActionRow(discord.ui.ActionRow[ManageSteamUserView]):
 
         button.disabled = True
         await interaction.response.edit_message(view=self.view)
-        # TODO: allow re-selecting same account
 
     @discord.ui.button(label="Back", style=discord.ButtonStyle.secondary)
     async def on_back(
