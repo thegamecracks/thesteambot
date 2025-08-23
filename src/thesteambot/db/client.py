@@ -64,6 +64,18 @@ class DatabaseClient:
             user_id,
         )
 
+    async def get_one_discord_user_steam(
+        self,
+        *,
+        user_id: int,
+        steam_id: int,
+    ) -> Record | None:
+        return await self.conn.fetchrow(
+            "SELECT * FROM discord_user_steam WHERE user_id = $1 AND steam_id = $2",
+            user_id,
+            steam_id,
+        )
+
     async def add_discord_member_steam(
         self,
         *,
@@ -76,6 +88,47 @@ class DatabaseClient:
         await self.conn.execute(
             "INSERT INTO discord_member_steam (guild_id, user_id, steam_id) "
             "VALUES ($1, $2, $3)",
+            guild_id,
+            user_id,
+            steam_id,
+        )
+
+    async def get_discord_member_steam(
+        self,
+        *,
+        guild_id: int,
+        user_id: int,
+    ) -> Sequence[Record]:
+        return await self.conn.fetch(
+            "SELECT * FROM discord_member_steam WHERE guild_id = $1 AND user_id = $2",
+            guild_id,
+            user_id,
+        )
+
+    async def get_one_discord_member_steam(
+        self,
+        *,
+        guild_id: int,
+        user_id: int,
+        steam_id: int,
+    ) -> Record | None:
+        return await self.conn.fetchrow(
+            "SELECT * FROM discord_member_steam WHERE guild_id = $1 AND user_id = $2 AND steam_id = $3",
+            guild_id,
+            user_id,
+            steam_id,
+        )
+
+    async def delete_discord_member_steam(
+        self,
+        *,
+        guild_id: int,
+        user_id: int,
+        steam_id: int,
+    ) -> None:
+        await self.conn.execute(
+            "DELETE FROM discord_member_steam "
+            "WHERE guild_id = $1 AND user_id = $2 AND steam_id = $3",
             guild_id,
             user_id,
             steam_id,
