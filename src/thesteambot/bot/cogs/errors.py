@@ -7,6 +7,7 @@ from discord.ext import commands
 
 from thesteambot.bot.bot import Bot, Context
 from thesteambot.bot.errors import (
+    AppCommandResponse,
     CommandResponse,
     MissingSteamUserError,
 )
@@ -121,7 +122,7 @@ async def on_app_command_error(
         await send("A check failed to pass before running this command.")
         log_app_command_error(interaction, error, debug=True)
     # Runtime errors
-    elif isinstance(error, CommandResponse):
+    elif isinstance(error, AppCommandResponse):
         if message := str(error):
             await send(message)
     elif isinstance(original, ExpiredDiscordOAuthError):
