@@ -1,19 +1,18 @@
-name: Lint with black
+name: Format with Ruff
 
 on:
   push:
     paths:
       - '**.py'
   pull_request:
-    branches:
-      - main
     paths:
       - '**.py'
 
 jobs:
   lint:
-    name: Run black
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: psf/black@25.9.0
+      - uses: astral-sh/ruff-action@v3
+        with:
+          args: format --check --diff
