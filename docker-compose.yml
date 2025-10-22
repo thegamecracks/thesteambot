@@ -28,13 +28,12 @@ services:
       DB_PORT: ${DB_PORT:?}
     # restart: unless-stopped
   db:
-    image: postgres:17
+    image: postgres:18
     environment:
       # Initialization
       POSTGRES_PASSWORD: ${DB_PASSWORD:?}
       POSTGRES_USER: ${DB_USER:?}
       POSTGRES_DB: ${DB_DATABASE:?}
-      PGDATA: /var/lib/postgresql/17/docker
       # Healthcheck
       PGPORT: ${DB_PORT:?}
       PGPASSWORD: ${DB_PASSWORD:?}
