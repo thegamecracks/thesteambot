@@ -8,16 +8,16 @@ description = "A Discord application for associating users with Steam accounts."
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
-    "asyncpg==0.30.0",
+    "asyncpg~=0.30.0",
     "asyncpg-stubs~=0.30.2",
     "authlib~=1.6",
     "discord.py~=2.6",
-    "hikari~=2.3.5",
-    "httpx==0.28.1",
+    "hikari~=2.4",
+    "httpx~=0.28.1",
     "jishaku~=2.6",
-    "pydantic~=2.11",
-    "starlette[full]==0.47.2",
-    "uvicorn==0.35.0",
+    "pydantic~=2.12",
+    "starlette[full]~=0.48.0",
+    "uvicorn~=0.38.0",
 ]
 
 [project.scripts]
