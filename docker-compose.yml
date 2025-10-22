@@ -15,9 +15,17 @@ services:
             - '**/static/'
             - '**/templates/'
           action: rebuild
-    env_file:
-      - .env
-      - .env.bot
+    environment:
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:?}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:?}
+      DOMAIN: ${DOMAIN:?}
+      DEBUG: ${DEBUG:?}
+      BOT_EXTENSIONS: ${BOT_EXTENSIONS}
+      BOT_TOKEN: ${BOT_TOKEN:?}
+      DB_PASSWORD: ${DB_PASSWORD:?}
+      DB_USER: ${DB_USER:?}
+      DB_DATABASE: ${DB_DATABASE:?}
+      DB_PORT: ${DB_PORT:?}
     # restart: unless-stopped
   db:
     image: postgres:17
@@ -51,8 +59,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    env_file:
-      - .env
+    environment:
+      DEBUG: ${DEBUG:?}
+      DB_PASSWORD: ${DB_PASSWORD:?}
+      DB_USER: ${DB_USER:?}
+      DB_DATABASE: ${DB_DATABASE:?}
+      DB_PORT: ${DB_PORT:?}
   web:
     build:
       context: .
@@ -75,9 +87,16 @@ services:
             - '**/static/'
             - '**/templates/'
           action: rebuild
-    env_file:
-      - .env
-      - .env.web
+    environment:
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:?}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:?}
+      DOMAIN: ${DOMAIN:?}
+      DEBUG: ${DEBUG:?}
+      DB_PASSWORD: ${DB_PASSWORD:?}
+      DB_USER: ${DB_USER:?}
+      DB_DATABASE: ${DB_DATABASE:?}
+      DB_PORT: ${DB_PORT:?}
+      WEB_SECRET_KEY: ${WEB_SECRET_KEY:?}
     ports:
       - 2500:8000
     # restart: unless-stopped
