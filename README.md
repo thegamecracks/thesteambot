@@ -51,13 +51,8 @@ Before running this application, you must have the following prepared:
 
 Once those are ready, you can configure the project:
 
-1. Copy and rename each of the `env.example` files with a `.` prefix added
-   and the `.example` suffix removed.
-
-   For example, `env.bot.example` should be renamed to `.env.bot`.
-
-2. Fill out each environment file with the appropriate values, such as your bot token
-   and domain.
+1. Copy the `env.example` file and rename it to `.env`.
+2. Fill out your `.env` file with appropriate values, such as your bot token and domain.
 
 ## Usage
 
