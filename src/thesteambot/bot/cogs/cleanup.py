@@ -65,8 +65,8 @@ class Cleanup(commands.Cog):
                     guild_id,
                 )
 
-        if len(rows) > 0:
-            log.info("%d guilds cleaned up", len(rows))
+        if deleted:
+            log.info("%d guilds cleaned up", len(deleted))
 
     # NOTE: Discord and Steam users are not removed by any event
     # NOTE: rows can still accumulate during bot downtime
